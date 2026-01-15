@@ -56,7 +56,12 @@ export {
 } from "./types.js";
 
 // Client
-export { BTCPAgentClient, createBTCPClient } from "./client.js";
+export {
+  BTCPAgentClient,
+  createBTCPClient,
+  createLocalBTCPClient,
+  type ToolHandler,
+} from "./client.js";
 
 // Browser tool factory
 export { createBrowserTool, type BrowserToolOptions } from "./browser-tool.js";

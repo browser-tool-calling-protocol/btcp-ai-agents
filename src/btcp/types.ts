@@ -151,10 +151,16 @@ export interface BTCPToolsListResult {
 
 /**
  * BTCP client configuration
+ *
+ * When serverUrl is omitted, the client runs in local mode where
+ * tools are registered directly (same context communication).
  */
 export interface BTCPClientConfig {
-  /** Server URL (e.g., http://localhost:8765) */
-  serverUrl: string;
+  /**
+   * Server URL for remote mode (e.g., http://localhost:8765)
+   * If omitted, client runs in local mode (tools registered directly)
+   */
+  serverUrl?: string;
   /** Session ID for connection */
   sessionId?: string;
   /** Client type identifier */

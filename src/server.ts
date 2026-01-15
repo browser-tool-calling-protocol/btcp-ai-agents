@@ -7,13 +7,16 @@
  * Features:
  * - AI SDK-compatible chat streaming
  * - Session context injection via X-Session-Id header
- * - BTCP integration for browser tool execution
+ * - BTCP integration for browser tool execution (local or remote mode)
  * - CORS configuration for frontend integration
  *
  * Environment Variables:
  * - PORT: Server port (default: 4111)
  * - NODE_ENV: Environment (development/staging/production)
- * - BTCP_SERVER_URL: BTCP server URL (default: http://localhost:8765)
+ *
+ * BTCP Mode:
+ * - Local: Agent and browser tools run in same context (no server needed)
+ * - Remote: Tools executed via BTCP server (set BTCP_SERVER_URL)
  */
 
 import dotenv from "dotenv";
@@ -95,12 +98,16 @@ async function main(): Promise<void> {
 
   // Start server
   app.listen(PORT, () => {
+    const btcpMode = process.env.BTCP_SERVER_URL ? "remote" : "local";
     console.log("========================================");
     console.log("  BTCP AI Agents Server");
     console.log("========================================");
     console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`BTCP Server: ${process.env.BTCP_SERVER_URL || "http://localhost:8765"}`);
+    console.log(`BTCP Mode: ${btcpMode}`);
+    if (btcpMode === "remote") {
+      console.log(`BTCP Server: ${process.env.BTCP_SERVER_URL}`);
+    }
     console.log("");
     console.log("Endpoints:");
     console.log(`  GET  /health  - Health check`);

@@ -274,6 +274,7 @@ export {
   // Client
   BTCPAgentClient,
   createBTCPClient,
+  createLocalBTCPClient,
 
   // Browser tool factory
   createBrowserTool,
@@ -289,6 +290,7 @@ export {
   type BrowserToolInput,
   type BrowserToolResult,
   type BTCPSession,
+  type ToolHandler,
 
   // Utilities
   generateRequestId,
