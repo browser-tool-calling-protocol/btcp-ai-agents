@@ -1,0 +1,210 @@
+{
+  "load_variables_from": [
+    {
+      "variable_loader_type": "dotenv",
+      "env_file_path": ".env"
+    }
+  ],
+  "manual_call_templates": [
+    {
+      "name": "canvas",
+      "call_template_type": "http",
+      "http_method": "POST",
+      "url": "http://localhost:3009/api/canvas",
+      "content_type": "application/json",
+      "description": "Canvas manipulation tools",
+      "tools": {
+        "query_entities": {
+          "description": "Find entities on canvas by selector",
+          "method": "POST",
+          "path": "/query",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "selector": {
+                "type": "object",
+                "description": "Query selector (e.g., {$all: true}, {type: 'rectangle'})"
+              }
+            },
+            "required": [
+              "selector"
+            ]
+          }
+        },
+        "create_entity": {
+          "description": "Create new entity on canvas",
+          "method": "POST",
+          "path": "/create",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "rectangle",
+                  "ellipse",
+                  "arrow",
+                  "line",
+                  "text",
+                  "image"
+                ]
+              },
+              "position": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                }
+              },
+              "size": {
+                "type": "object",
+                "properties": {
+                  "width": {
+                    "type": "number"
+                  },
+                  "height": {
+                    "type": "number"
+                  }
+                }
+              },
+              "fill": {
+                "type": "object",
+                "properties": {
+                  "color": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "type",
+              "position",
+              "size"
+            ]
+          }
+        },
+        "modify_entities": {
+          "description": "Modify existing entities",
+          "method": "POST",
+          "path": "/modify",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "selector": {
+                "type": "object"
+              },
+              "changes": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "selector",
+              "changes"
+            ]
+          }
+        },
+        "delete_entities": {
+          "description": "Delete entities from canvas",
+          "method": "POST",
+          "path": "/delete",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "selector": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "selector"
+            ]
+          }
+        },
+        "execute_operation": {
+          "description": "Execute high-level operations (align, distribute, group)",
+          "method": "POST",
+          "path": "/execute",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "type": "string",
+                "enum": [
+                  "align",
+                  "distribute",
+                  "group",
+                  "ungroup",
+                  "duplicate"
+                ]
+              },
+              "selector": {
+                "type": "object"
+              },
+              "params": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "operation",
+              "selector"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "memory",
+      "call_template_type": "http",
+      "http_method": "POST",
+      "url": "http://localhost:3009/api/memory",
+      "content_type": "application/json",
+      "description": "User preferences and memory",
+      "tools": {
+        "get_preference": {
+          "description": "Get user preference by key",
+          "method": "POST",
+          "path": "/get",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        },
+        "save_preference": {
+          "description": "Save user preference",
+          "method": "POST",
+          "path": "/save",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {}
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "tool_repository": {
+    "tool_repository_type": "in_memory"
+  },
+  "tool_search_strategy": {
+    "tool_search_strategy_type": "tag_and_description_word_match"
+  },
+  "post_processing": []
+}

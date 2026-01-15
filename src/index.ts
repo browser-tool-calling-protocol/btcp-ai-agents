@@ -1,0 +1,286 @@
+/**
+ * @btcp/ai-agents
+ *
+ * Generic, browser-compatible AI agent system with pluggable skills and action adapters.
+ *
+ * ## SDK-Compatible API
+ *
+ * @example
+ * ```typescript
+ * // Query API (V1 Pattern)
+ * import { query } from '@btcp/ai-agents';
+ *
+ * const messages = query('Analyze this data', { sessionId: 'my-session' });
+ * for await (const message of messages) {
+ *   console.log(message);
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Session API (V2 Pattern)
+ * import { createSession } from '@btcp/ai-agents';
+ *
+ * const session = await createSession({ provider: 'google' });
+ * await session.send('Create a plan');
+ * for await (const msg of session.stream()) {
+ *   console.log(msg);
+ * }
+ * await session.close();
+ * ```
+ *
+ * Implements the 7 Claude Code patterns for optimal agent performance:
+ * 1. Minimal Tools, Maximum Composability
+ * 2. Streaming-First Architecture
+ * 3. Explicit Reasoning Structure (XML tags)
+ * 4. Stateless Systems, Observable State
+ * 5. Pre/Post Hooks for Observability
+ * 6. Skills as Compressed Context
+ * 7. Sub-Agent Delegation
+ */
+
+// =============================================================================
+// CORE API (Claude Agent SDK Compatible)
+// =============================================================================
+
+// Re-export the core module for convenience
+import * as coreModule from "./core/index.js";
+export { coreModule as core };
+export { coreModule as sdk };
+
+// Primary SDK exports for top-level access
+export {
+  // Query API (V1 Pattern)
+  query,
+  prompt,
+  runQuery,
+  streamQuery,
+  type Query,
+  type QueryOptions,
+
+  // Session API (V2 Pattern)
+  createSession,
+  resumeSession,
+  type Session,
+  type SessionOptions,
+
+  // Message types
+  type SDKMessage,
+  type SDKResultMessage,
+  type SDKAssistantMessage,
+  type SDKPartialMessage,
+
+  // Tool factory
+  tool,
+  type Tool,
+  createToolRegistry,
+
+  // Configuration
+  mergeWithDefaults,
+  migrateFromLegacyOptions,
+
+  // Constants
+  MODELS,
+  DEFAULTS,
+  LIMITS,
+
+  // Utilities
+  extractJson,
+  parseStructured,
+  extractTag,
+
+  // Execution Engine (Native Implementation)
+  execute,
+  runExecution,
+  getExecutionResult,
+  type ExecuteOptions,
+
+  // Providers (Native Implementation)
+  createProvider,
+  isProviderAvailable,
+  getAvailableProviders,
+  getDefaultProvider,
+  GoogleProvider,
+  OpenAIProvider,
+  type LLMProvider,
+  type GenerateOptions,
+  type GenerateResult,
+  type StreamChunk,
+  type ProviderConfig,
+  type ProviderName,
+
+  // AI Client (Native Implementation)
+  createAISDKClient,
+  getModelId,
+  getModelForProvider,
+  type AIClientConfig,
+  type ReasoningResult,
+
+  // Constants (engine-level)
+  MODEL_IDS,
+  MODEL_DEFAULTS,
+  createToolResultMessage,
+  buildMessages,
+} from "./core/index.js";
+
+// =============================================================================
+// GENERIC AGENTS
+// =============================================================================
+
+export {
+  // Types
+  type AgentEvent,
+  type AgentEventType,
+  type AgentConfig,
+  type AgentMode,
+  type AgentState,
+  type CancellationToken,
+  createCancellationToken,
+
+  // Context builder
+  buildContext,
+  type ContextOptions,
+  type BuiltContext,
+
+  // System prompts
+  getSystemPrompt,
+  getGenericSystemPrompt,
+  withContext,
+  PROMPTS,
+
+  // Generic agent definitions
+  GENERIC_AGENT,
+  PLANNER_AGENT,
+  EXECUTOR_AGENT,
+  ANALYZER_AGENT,
+  EXPLORER_AGENT,
+  GENERIC_AGENTS,
+  getGenericAgent,
+  detectGenericAgent,
+  getGenericSpecialistTypes,
+  getGenericAgentTools,
+  type GenericAgentType,
+  type GenericAgentDefinition,
+  type GenericAgentCapabilities,
+  type ModelTier,
+
+  // Mode detection
+  detectAgentMode,
+  getModeConfidence,
+  detectAllModes,
+  MODE_DESCRIPTIONS,
+} from "./agents/index.js";
+
+// =============================================================================
+// GENERIC TOOLS
+// =============================================================================
+
+export * from "./tools/index.js";
+
+// =============================================================================
+// SKILLS (Pluggable Registry)
+// =============================================================================
+
+export {
+  createSkillRegistry,
+  getSkillRegistry,
+  setSkillRegistry,
+  type SkillPlugin,
+  type SkillRegistry,
+  type SkillInjectionConfig,
+  type SkillInjectionResult,
+} from "./skills/index.js";
+
+// =============================================================================
+// ACTION ADAPTERS
+// =============================================================================
+
+export {
+  createActionAdapterRegistry,
+  getAdapterRegistry,
+  setAdapterRegistry,
+  type ActionAdapter,
+  type ActionAdapterRegistry,
+} from "./adapters/index.js";
+
+// =============================================================================
+// PLATFORM ABSTRACTION
+// =============================================================================
+
+export {
+  setPlatform,
+  getPlatform,
+  hasPlatform,
+  getEnv,
+  getAssets,
+  getStorage,
+  getLogger,
+} from "./platform/registry.js";
+
+export type {
+  PlatformAdapter,
+  EnvironmentAdapter,
+  AssetLoader,
+  StorageAdapter,
+  LoggerAdapter,
+} from "./platform/types.js";
+
+// =============================================================================
+// TYPES
+// =============================================================================
+
+export type {
+  AgentType,
+  ModelProvider,
+  ModelPreference,
+  AgentDefinition,
+  AgentCapabilities,
+  ResolvedAliasContext,
+  ContextStrategy,
+  Checkpoint,
+  OperationRecord,
+  ErrorRecord,
+  HookType,
+  HookContext,
+  HookResult,
+  HookHandler,
+  SkillDefinition,
+  SubAgentRequest,
+  CommandDefinition,
+  ChatMessage,
+  ChatHandlerConfig,
+  AgentTool,
+} from "./types/index.js";
+
+// Re-export with aliases to avoid conflicts
+export type { AgentResources as CoreAgentResources } from "./types/index.js";
+export type { TaskStatus as CoreTaskStatus } from "./types/index.js";
+export type { ToolDefinition as SimpleToolDefinition } from "./types/index.js";
+
+// Export schemas and constants from types
+export { chatMessageSchema, chatRequestSchema } from "./types/index.js";
+
+// =============================================================================
+// UTILITIES
+// =============================================================================
+
+export * from "./utils/streaming.js";
+
+// =============================================================================
+// NAMESPACE EXPORTS (Module organization)
+// =============================================================================
+
+// Context management system - token budgeting, tiered memory, compression
+export * as context from "./context/index.js";
+
+// Hooks system - observability, metrics, lifecycle hooks
+export * as hooks from "./hooks/index.js";
+
+// Aliases system - @alias syntax for referencing data
+export * as aliases from "./aliases/index.js";
+
+// Resources system - unified data access for agents
+export * as resources from "./resources/index.js";
+
+// Commands system - slash command support
+export * as commands from "./commands/index.js";
