@@ -2,14 +2,18 @@
  * Agent Types
  *
  * Type definitions for the streaming agent architecture.
+ * Updated to use browser/session terminology for BTCP integration.
+ *
  * Enhanced with full integration support for:
  * - ContextManager (tiered memory)
  * - HooksManager (pre/post hooks)
  * - ResourceRegistry (@alias resolution)
  * - SessionSerializer (persistence)
+ * - BTCPAgentClient (browser tool execution)
  */
 
 import type { AgentToolName } from "../tools/generic-definitions.js";
+import type { BTCPAgentClient } from "../btcp/client.js";
 
 // Tool result type
 interface ToolResult {
@@ -18,8 +22,10 @@ interface ToolResult {
   error?: string;
 }
 
-// Legacy type alias
-type CanvasToolName = AgentToolName;
+// Type alias for browser tools
+type BrowserToolName = AgentToolName;
+/** @deprecated Use BrowserToolName instead */
+type CanvasToolName = BrowserToolName;
 import type { AgentResources } from "./state.js";
 import type { ContextManager } from "../context/manager.js";
 import type { HooksManager } from "../hooks/manager.js";
@@ -105,7 +111,7 @@ export interface PlanEvent extends BaseAgentEvent {
   type: "plan";
   steps: Array<{
     description: string;
-    tool?: CanvasToolName;
+    tool?: BrowserToolName;
   }>;
 }
 
@@ -116,7 +122,7 @@ export interface StepStartEvent extends BaseAgentEvent {
   type: "step_start";
   step: number;
   description: string;
-  tool?: CanvasToolName;
+  tool?: BrowserToolName;
 }
 
 /**
@@ -133,7 +139,7 @@ export interface StepCompleteEvent extends BaseAgentEvent {
  */
 export interface ActingEvent extends BaseAgentEvent {
   type: "acting";
-  tool: CanvasToolName;
+  tool: BrowserToolName;
   input: unknown;
 }
 
@@ -151,7 +157,7 @@ export interface ObservingEvent extends BaseAgentEvent {
 export interface BlockedEvent extends BaseAgentEvent {
   type: "blocked";
   reason: string;
-  tool?: CanvasToolName;
+  tool?: BrowserToolName;
 }
 
 /**
@@ -238,7 +244,7 @@ export interface AliasResolvedEvent extends BaseAgentEvent {
 export interface CheckpointEvent extends BaseAgentEvent {
   type: "checkpoint";
   sessionId: string;
-  canvasVersion: number;
+  browserVersion: number;
   operationCount: number;
 }
 
@@ -388,10 +394,8 @@ export type AgentEvent =
  * Agent configuration
  */
 export interface AgentConfig {
-  /** Canvas ID to operate on */
-  canvasId: string;
-  /** Session ID for tracking */
-  sessionId?: string;
+  /** Session ID for browser connection */
+  sessionId: string;
   /** Model provider (default: google) - supports "google" and "openai" */
   provider?: "google" | "openai";
   /** Model tier or full model ID (default: balanced) */
@@ -408,7 +412,9 @@ export interface AgentConfig {
   autoDetectMode?: boolean;
   /** Specific mode override */
   mode?: AgentMode;
-  /** MCP server URL (default: http://localhost:3112) */
+  /** BTCP server URL (default: http://localhost:8765) */
+  btcpUrl?: string;
+  /** MCP server URL (legacy, deprecated) */
   mcpUrl?: string;
   /** MCP server configuration (legacy) */
   mcp?: McpConfig;
@@ -481,18 +487,23 @@ export interface AgentConfig {
    * - Main agent: omit for all tools (default behavior)
    * - Sub-agents: use definition.allowedTools from SUBAGENT_DEFINITIONS
    *
-   * This enables secure tool isolation for sub-agents. By not including
-   * canvas_delegate in a sub-agent's allowedTools, infinite nesting is prevented.
+   * This enables secure tool isolation for sub-agents.
    *
    * @example
    * // Sub-agent with restricted tools
-   * enabledTools: ['canvas_read', 'canvas_write', 'canvas_edit']
+   * enabledTools: ['context_read', 'context_write', 'task_execute']
    *
    * @example
    * // Main agent with all tools (default when omitted)
    * enabledTools: undefined
    */
-  enabledTools?: CanvasToolName[];
+  enabledTools?: BrowserToolName[];
+
+  /**
+   * BTCP agent client for browser tool execution.
+   * If not provided, a default client will be created using btcpUrl.
+   */
+  btcpClient?: BTCPAgentClient;
 }
 
 /**
@@ -526,7 +537,7 @@ export interface McpConfig {
 export interface ReasoningResult {
   thinking: string;
   decision: "continue" | "complete";
-  tool?: CanvasToolName;
+  tool?: BrowserToolName;
   input?: Record<string, unknown>;
   summary?: string;
 }
@@ -539,7 +550,7 @@ export interface AgentContext {
   skeleton?: unknown;
   relevant?: unknown[];
   working?: unknown[];
-  history?: Array<{ tool: CanvasToolName; result: unknown }>;
+  history?: Array<{ tool: BrowserToolName; result: unknown }>;
   tokensUsed: number;
   compressionRatio?: number;
 }
@@ -600,11 +611,11 @@ export interface AgentState {
   resources: AgentResources;
   iteration: number;
   errors: Array<{ code: string; message: string }>;
-  history: Array<{ tool: CanvasToolName; result: unknown }>;
+  history: Array<{ tool: BrowserToolName; result: unknown }>;
   startTime: number;
 
   /**
-   * Current task list from canvas_plan (like Claude Code's TodoWrite state)
+   * Current task list from agent_plan (like Claude Code's TodoWrite state)
    * Injected into context each iteration for task awareness
    */
   taskState: PlanTask[];

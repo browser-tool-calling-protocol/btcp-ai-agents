@@ -267,8 +267,44 @@ export { chatMessageSchema, chatRequestSchema } from "./types/index.js";
 export * from "./utils/streaming.js";
 
 // =============================================================================
+// BTCP (Browser Tool Calling Protocol)
+// =============================================================================
+
+export {
+  // Client
+  BTCPAgentClient,
+  createBTCPClient,
+  createLocalBTCPClient,
+
+  // Browser tool factory
+  createBrowserTool,
+  createBrowserToolSet,
+  formatBrowserToolsForPrompt,
+  type BrowserToolOptions,
+
+  // Types
+  type BTCPClientConfig,
+  type BTCPToolDefinition,
+  type BTCPToolResult,
+  type BTCPConnectionState,
+  type BrowserToolInput,
+  type BrowserToolResult,
+  type BTCPSession,
+  type ToolHandler,
+
+  // Utilities
+  generateRequestId,
+  generateSessionId,
+  BTCPError,
+  BTCPErrorCodes,
+} from "./btcp/index.js";
+
+// =============================================================================
 // NAMESPACE EXPORTS (Module organization)
 // =============================================================================
+
+// BTCP module - browser tool calling protocol
+export * as btcp from "./btcp/index.js";
 
 // Context management system - token budgeting, tiered memory, compression
 export * as context from "./context/index.js";

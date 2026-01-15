@@ -4,39 +4,50 @@
  * Stateless systems with observable state.
  * All agent state lives in resources - serializable, inspectable, testable.
  *
+ * Updated to use browser/session terminology for BTCP integration.
+ *
  * @see docs/engineering/CLAUDE_CODE_PATTERNS.md#pattern-4
  */
 
 import type { AgentToolName } from "../tools/generic-definitions.js";
+import type { BTCPToolDefinition } from "../btcp/types.js";
 
 // Legacy type alias
-type CanvasToolName = AgentToolName;
+type BrowserToolName = AgentToolName;
 
 /**
- * Canvas resource - current canvas state
+ * Browser resource - current browser state
  */
-export interface CanvasResource {
-  /** Canvas identifier */
+export interface BrowserResource {
+  /** Session identifier */
   id: string;
   /** Version number (incremented on each change) */
   version: number;
-  /** Summary of canvas content */
-  summary?: CanvasSummary;
-  /** Elements currently being worked on */
+  /** Available browser tools (from BTCP) */
+  availableTools?: BTCPToolDefinition[];
+  /** Summary of browser state */
+  summary?: BrowserSummary;
+  /** Current working context */
   workingSet?: Element[];
   /** Last known viewport */
   viewport?: ViewportState;
 }
 
 /**
- * Canvas summary
+ * Browser summary
  */
-export interface CanvasSummary {
+export interface BrowserSummary {
   elementCount: number;
   typeBreakdown: Record<string, number>;
   bounds: BoundingBox;
-  frameCount: number;
+  toolCount: number;
 }
+
+// Legacy type aliases
+/** @deprecated Use BrowserResource instead */
+export type CanvasResource = BrowserResource;
+/** @deprecated Use BrowserSummary instead */
+export type CanvasSummary = BrowserSummary;
 
 /**
  * Viewport state
@@ -110,7 +121,7 @@ export type TaskStatus =
 export interface Checkpoint {
   step: number;
   timestamp: number;
-  canvasVersion: number;
+  browserVersion: number;
   data?: unknown;
 }
 
@@ -126,19 +137,24 @@ export interface TaskError {
 }
 
 /**
- * Canvas awareness - AI's understanding of current canvas state
+ * Browser awareness - AI's understanding of current browser state
  *
  * This is NOT the LLM context window (see packages/ai-agents/src/context).
- * This is the canvas state snapshot that the AI uses for reasoning.
+ * This is the browser state snapshot that the AI uses for reasoning.
  *
- * Fetched via canvas_snapshot MCP tool and cached with staleness tracking.
+ * Fetched via BTCP tools and cached with staleness tracking.
  */
-export interface CanvasAwareness {
+export interface BrowserAwareness {
   /** Compact summary string */
   summary: string;
   /** Formatted context string */
   formatted?: string;
-  /** Frame skeleton */
+  /** Available browser tools from BTCP */
+  availableTools?: Array<{
+    name: string;
+    description: string;
+  }>;
+  /** DOM or page structure skeleton */
   skeleton?: Array<{
     id: string;
     name?: string;
@@ -161,11 +177,14 @@ export interface CanvasAwareness {
   compressionRatio?: number;
 }
 
+/** @deprecated Use BrowserAwareness instead */
+export type CanvasAwareness = BrowserAwareness;
+
 /**
  * Context resource - token management and cached context
  *
  * Implements caching with staleness tracking to avoid
- * redundant MCP calls during the agentic loop.
+ * redundant BTCP calls during the agentic loop.
  */
 export interface ContextResource {
   /** Token budget */
@@ -177,10 +196,10 @@ export interface ContextResource {
   /** Loaded skills */
   skills: string[];
 
-  // === Canvas Awareness (cached snapshot) ===
+  // === Browser Awareness (cached snapshot) ===
 
-  /** Cached canvas awareness (AI's understanding of canvas state) */
-  awareness: CanvasAwareness | null;
+  /** Cached browser awareness (AI's understanding of browser state) */
+  awareness: BrowserAwareness | null;
   /** When the awareness was fetched */
   awarenessFetchedAt: number;
   /** Is the awareness stale? (invalidated after mutations) */
@@ -211,7 +230,7 @@ export interface HistoryResource {
  * History entry
  */
 export interface HistoryEntry {
-  tool: CanvasToolName;
+  tool: BrowserToolName;
   input: unknown;
   result: unknown;
   timestamp: number;
@@ -223,21 +242,25 @@ export interface HistoryEntry {
  * Complete agent resources
  */
 export interface AgentResources {
-  canvas: CanvasResource;
+  browser: BrowserResource;
   task: TaskResource;
   context: ContextResource;
   history: HistoryResource;
 }
 
+// Legacy type alias for backward compatibility
+/** @deprecated Use AgentResources.browser instead of AgentResources.canvas */
+type CanvasToolName = BrowserToolName;
+
 /**
  * Create default resources
  */
-export function createResources(canvasId: string): AgentResources {
+export function createResources(sessionId: string): AgentResources {
   const now = Date.now();
 
   return {
-    canvas: {
-      id: canvasId,
+    browser: {
+      id: sessionId,
       version: 0,
     },
     task: {
@@ -268,7 +291,7 @@ export function createResources(canvasId: string): AgentResources {
  */
 export function cloneResources(resources: AgentResources): AgentResources {
   return {
-    canvas: { ...resources.canvas },
+    browser: { ...resources.browser },
     task: { ...resources.task, errors: [...resources.task.errors] },
     context: {
       ...resources.context,
@@ -284,17 +307,20 @@ export function cloneResources(resources: AgentResources): AgentResources {
 }
 
 /**
- * Update canvas resource
+ * Update browser resource
  */
-export function updateCanvas(
+export function updateBrowser(
   resources: AgentResources,
-  updates: Partial<CanvasResource>
+  updates: Partial<BrowserResource>
 ): AgentResources {
   return {
     ...resources,
-    canvas: { ...resources.canvas, ...updates },
+    browser: { ...resources.browser, ...updates },
   };
 }
+
+/** @deprecated Use updateBrowser instead */
+export const updateCanvas = updateBrowser;
 
 /**
  * Update task resource
@@ -360,7 +386,7 @@ export function createCheckpoint(
       checkpoint: {
         step: resources.task.currentStep,
         timestamp: Date.now(),
-        canvasVersion: resources.canvas.version,
+        browserVersion: resources.browser.version,
         data,
       },
     },
@@ -368,39 +394,39 @@ export function createCheckpoint(
 }
 
 // ============================================================================
-// Canvas Awareness Helpers
+// Browser Awareness Helpers
 // ============================================================================
 
 /**
  * Tools that mutate state (require context invalidation)
  */
-export const MUTATION_TOOLS: CanvasToolName[] = [
+export const MUTATION_TOOLS: BrowserToolName[] = [
   "context_write",
   "task_execute",
-] as unknown as CanvasToolName[];
+] as unknown as BrowserToolName[];
 
 /**
  * Tools that only read state (no invalidation needed)
  */
-export const READ_ONLY_TOOLS: CanvasToolName[] = [
+export const READ_ONLY_TOOLS: BrowserToolName[] = [
   "context_read",
   "context_search",
   "state_snapshot",
-] as unknown as CanvasToolName[];
+] as unknown as BrowserToolName[];
 
 /**
- * Check if a tool mutates canvas state
+ * Check if a tool mutates browser state
  */
-export function isMutationTool(tool: CanvasToolName): boolean {
+export function isMutationTool(tool: BrowserToolName): boolean {
   return MUTATION_TOOLS.includes(tool);
 }
 
 /**
- * Update cached awareness after fetching from MCP
+ * Update cached awareness after fetching from BTCP
  */
 export function updateAwareness(
   resources: AgentResources,
-  awareness: CanvasAwareness
+  awareness: BrowserAwareness
 ): AgentResources {
   return {
     ...resources,
@@ -424,10 +450,10 @@ export function invalidateAwareness(resources: AgentResources): AgentResources {
       ...resources.context,
       awarenessIsStale: true,
     },
-    // Also increment canvas version on mutation
-    canvas: {
-      ...resources.canvas,
-      version: resources.canvas.version + 1,
+    // Also increment browser version on mutation
+    browser: {
+      ...resources.browser,
+      version: resources.browser.version + 1,
     },
   };
 }
@@ -476,5 +502,5 @@ export function deserializeResources(data: string): AgentResources {
  * Get resource summary for debugging
  */
 export function getResourcesSummary(resources: AgentResources): string {
-  return `Canvas: v${resources.canvas.version} | Task: ${resources.task.status} (step ${resources.task.currentStep}) | Context: ${resources.context.tokensUsed}/${resources.context.tokenBudget} tokens | History: ${resources.history.operations.length} ops`;
+  return `Browser: v${resources.browser.version} | Task: ${resources.task.status} (step ${resources.task.currentStep}) | Context: ${resources.context.tokensUsed}/${resources.context.tokenBudget} tokens | History: ${resources.history.operations.length} ops`;
 }

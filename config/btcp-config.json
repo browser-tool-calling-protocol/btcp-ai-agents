@@ -1,0 +1,22 @@
+{
+  "$schema": "./btcp-config.schema.json",
+  "description": "BTCP (Browser Tool Calling Protocol) configuration for AI agents",
+  "version": "1.0.0",
+
+  "agent": {
+    "defaultModel": "balanced",
+    "maxIterations": 20,
+    "tokenBudget": 8000
+  },
+
+  "browser": {
+    "description": "Browser tool configuration - tools are dynamically registered by the browser client",
+    "timeout": 30000,
+    "retries": 3
+  },
+
+  "logging": {
+    "level": "${LOG_LEVEL:-info}",
+    "format": "json"
+  }
+}

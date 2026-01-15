@@ -1,17 +1,22 @@
 /**
  * AI Agents Server - Pure Express
  *
- * Standalone Express server for canvas agent chat.
+ * Standalone Express server for browser agent chat.
  * Replaces Mastra framework with minimal dependencies.
  *
  * Features:
  * - AI SDK-compatible chat streaming
- * - Canvas context injection via X-Canvas-Id header
+ * - Session context injection via X-Session-Id header
+ * - BTCP integration for browser tool execution (local or remote mode)
  * - CORS configuration for frontend integration
  *
  * Environment Variables:
  * - PORT: Server port (default: 4111)
  * - NODE_ENV: Environment (development/staging/production)
+ *
+ * BTCP Mode:
+ * - Local: Agent and browser tools run in same context (no server needed)
+ * - Remote: Tools executed via BTCP server (set BTCP_SERVER_URL)
  */
 
 import dotenv from "dotenv";
@@ -31,30 +36,38 @@ dotenv.config({ path: join(packageRoot, ".env") });
 const PORT = parseInt(process.env.PORT || "4111", 10);
 
 /**
- * Canvas ID extraction middleware
+ * Session ID extraction middleware
  *
- * Extracts canvasId from:
- * 1. X-Canvas-Id header (for MCP workflow calls)
- * 2. Request body canvasId field (for AI SDK useChat)
+ * Extracts sessionId from:
+ * 1. X-Session-Id header (for BTCP workflow calls)
+ * 2. Request body sessionId field (for AI SDK useChat)
  *
- * Sets req.canvasId for downstream handlers.
+ * Sets req.sessionId for downstream handlers.
  */
-function canvasIdMiddleware(
+function sessionIdMiddleware(
   req: express.Request,
   _res: express.Response,
   next: express.NextFunction
 ): void {
-  // Try X-Canvas-Id header first
-  let canvasId = req.headers["x-canvas-id"] as string | undefined;
+  // Try X-Session-Id header first
+  let sessionId = req.headers["x-session-id"] as string | undefined;
 
   // Fall back to request body
-  if (!canvasId && req.body?.canvasId) {
-    canvasId = req.body.canvasId;
+  if (!sessionId && req.body?.sessionId) {
+    sessionId = req.body.sessionId;
   }
 
-  if (canvasId) {
+  // Legacy support: also check for X-Canvas-Id / canvasId
+  if (!sessionId) {
+    sessionId = req.headers["x-canvas-id"] as string | undefined;
+    if (!sessionId && req.body?.canvasId) {
+      sessionId = req.body.canvasId;
+    }
+  }
+
+  if (sessionId) {
     // Attach to request for handlers
-    (req as express.Request & { canvasId?: string }).canvasId = canvasId;
+    (req as express.Request & { sessionId?: string }).sessionId = sessionId;
   }
 
   next();
@@ -68,7 +81,7 @@ async function main(): Promise<void> {
     cors({
       origin: "*",
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization", "X-Canvas-Id"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-Session-Id", "X-Canvas-Id"],
       maxAge: 86400,
     })
   );
@@ -76,8 +89,8 @@ async function main(): Promise<void> {
   // Body parsing
   app.use(express.json({ limit: "10mb" }));
 
-  // Canvas ID extraction
-  app.use(canvasIdMiddleware);
+  // Session ID extraction
+  app.use(sessionIdMiddleware);
 
   // Mount chat routes
   const chatRouter = await createChatRouter();
@@ -85,18 +98,23 @@ async function main(): Promise<void> {
 
   // Start server
   app.listen(PORT, () => {
+    const btcpMode = process.env.BTCP_SERVER_URL ? "remote" : "local";
     console.log("========================================");
-    console.log("  AI Agents Server");
+    console.log("  BTCP AI Agents Server");
     console.log("========================================");
     console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`BTCP Mode: ${btcpMode}`);
+    if (btcpMode === "remote") {
+      console.log(`BTCP Server: ${process.env.BTCP_SERVER_URL}`);
+    }
     console.log("");
     console.log("Endpoints:");
     console.log(`  GET  /health  - Health check`);
     console.log(`  POST /chat    - Streaming chat (SSE)`);
-    console.log(`  POST /command - Canvas commands`);
+    console.log(`  POST /command - Browser commands`);
     console.log("");
-    console.log("Engine: claude-code-patterns v2.0.0");
+    console.log("Protocol: BTCP (Browser Tool Calling Protocol)");
     console.log("========================================");
   });
 }
