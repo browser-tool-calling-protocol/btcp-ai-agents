@@ -3,12 +3,6 @@
   "description": "BTCP (Browser Tool Calling Protocol) configuration for AI agents",
   "version": "1.0.0",
 
-  "server": {
-    "url": "${BTCP_SERVER_URL:-http://localhost:8765}",
-    "timeout": 30000,
-    "retries": 3
-  },
-
   "agent": {
     "defaultModel": "balanced",
     "maxIterations": 20,
@@ -16,55 +10,13 @@
   },
 
   "browser": {
-    "description": "Browser tool configuration",
-    "toolDescription": "Execute browser tools via BTCP protocol. Tools are dynamically registered by the browser client.",
-    "defaultTools": [
-      {
-        "name": "browser_click",
-        "description": "Click an element on the page",
-        "category": "interaction"
-      },
-      {
-        "name": "browser_fill",
-        "description": "Fill an input field with text",
-        "category": "interaction"
-      },
-      {
-        "name": "browser_snapshot",
-        "description": "Take a screenshot of the current page",
-        "category": "observation"
-      },
-      {
-        "name": "browser_navigate",
-        "description": "Navigate to a URL",
-        "category": "navigation"
-      },
-      {
-        "name": "browser_scroll",
-        "description": "Scroll the page",
-        "category": "interaction"
-      },
-      {
-        "name": "browser_select",
-        "description": "Select an option from a dropdown",
-        "category": "interaction"
-      },
-      {
-        "name": "browser_wait",
-        "description": "Wait for an element or condition",
-        "category": "utility"
-      }
-    ]
+    "description": "Browser tool configuration - tools are dynamically registered by the browser client",
+    "timeout": 30000,
+    "retries": 3
   },
 
   "logging": {
     "level": "${LOG_LEVEL:-info}",
     "format": "json"
-  },
-
-  "legacy": {
-    "description": "Legacy configuration for backward compatibility",
-    "supportCanvasId": true,
-    "supportMcpUrl": true
   }
 }
