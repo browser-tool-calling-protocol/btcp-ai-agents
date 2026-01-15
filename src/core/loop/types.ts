@@ -2,6 +2,8 @@
  * Loop Types
  *
  * Shared type definitions for the TOAD (Think, Act, Observe, Decide) loop.
+ *
+ * Updated to use browser/session terminology for BTCP integration.
  */
 
 import type { Content } from "@google/genai";
@@ -12,7 +14,7 @@ import type {
   CancellationToken,
   PlanTask,
 } from "../../agents/types.js";
-import type { CanvasAwareness } from "../../agents/state.js";
+import type { BrowserAwareness } from "../../agents/state.js";
 import type { ContextManager } from "../../context/manager.js";
 import type { HooksManager } from "../../hooks/manager.js";
 import type { ResourceRegistry } from "../../resources/registry.js";
@@ -24,25 +26,47 @@ import type { AgentTool, ModelPreference, ModelProvider } from "../../types/inde
 import type { AgentToolName } from "../../tools/generic-definitions.js";
 import type { ToolSet } from "../../tools/ai-sdk-bridge.js";
 import type { LogReporter } from "../log-reporter.js";
+import type { BTCPAgentClient } from "../../btcp/client.js";
 
 // ============================================================================
-// MCP CLIENT TYPE
+// BTCP/MCP CLIENT TYPES
 // ============================================================================
 
 /**
- * MCP client interface for tool execution
+ * MCP client interface for tool execution (legacy)
+ * @deprecated Use BTCPAgentClient for browser tool execution
  */
 export interface McpClient {
   callTool(name: string, args: Record<string, unknown>): Promise<unknown>;
   getTools?(): Promise<Array<{ name: string; description: string }>>;
 }
 
+/**
+ * Browser client interface (BTCP)
+ * This is the primary client for browser tool execution
+ */
+export interface BrowserClient {
+  /** Connect to BTCP server */
+  connect(): Promise<boolean>;
+  /** Disconnect from server */
+  disconnect(): void;
+  /** Get connection state */
+  getState(): "disconnected" | "connecting" | "connected" | "reconnecting" | "error";
+  /** Get available tools from browser */
+  getTools(): Array<{ name: string; description: string; inputSchema: unknown }>;
+  /** Check if a tool is available */
+  hasTool(name: string): boolean;
+  /** Call a browser tool */
+  callTool(name: string, args: Record<string, unknown>): Promise<unknown>;
+}
+
 // ============================================================================
-// MCP EXECUTOR
+// EXECUTOR INTERFACE
 // ============================================================================
 
 /**
- * MCP executor interface - injected dependency for tool execution
+ * Executor interface - injected dependency for tool execution
+ * @deprecated Use BTCPAgentClient directly for browser tools
  */
 export interface MCPExecutor {
   execute(tool: AgentTool | string, input: unknown): Promise<unknown>;
@@ -141,7 +165,6 @@ export interface LoopContext {
   // Core identifiers
   readonly task: string;
   readonly resolvedTask: string;
-  readonly canvasId: string;
   readonly sessionId: string;
 
   // Configuration
@@ -161,7 +184,10 @@ export interface LoopContext {
   readonly toolLifecycle: ToolResultLifecycle;
   readonly echoPrevention: EchoPoisoningPrevention;
 
-  // MCP & Tools
+  // Browser client (BTCP) - primary tool execution
+  readonly browserClient?: BTCPAgentClient;
+
+  // MCP client (legacy, for backward compatibility)
   readonly mcpClient: McpClient & {
     connect(): Promise<boolean>;
     disconnect(): void;
@@ -206,7 +232,7 @@ export interface LoopState {
 export interface ThinkResult {
   events: AgentEvent[];
   userMessage: string;
-  awareness: CanvasAwareness;
+  awareness: BrowserAwareness;
   stateSnapshot: StateSnapshotOutput | null;
   corrections: string | null;
 }
@@ -272,10 +298,15 @@ export type {
   EchoPoisoningPrevention,
   ModelPreference,
   ModelProvider,
-  CanvasAwareness,
+  BrowserAwareness,
   LogReporter,
+  BTCPAgentClient,
 };
 
-// Legacy type alias
+// Legacy type aliases (for backward compatibility)
+/** @deprecated Use AgentToolName instead */
 export type CanvasToolName = AgentToolName;
+/** @deprecated Use StateSnapshotOutput instead */
 export type CanvasSnapshotOutput = StateSnapshotOutput;
+/** @deprecated Use BrowserAwareness instead */
+export type CanvasAwareness = BrowserAwareness;
