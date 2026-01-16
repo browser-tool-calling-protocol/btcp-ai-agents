@@ -53,9 +53,6 @@ import { getSystemPrompt } from "../../agents/prompts.js";
 import { detectAgentMode } from "../../agents/mode-detection.js";
 import { getSkillRegistry } from "../../skills/index.js";
 
-// Adapter imports
-import { createMCPAdapter } from "../../adapters/mcp-adapter.js";
-
 // Helper function for skill injection
 function injectRelevantSkills(task: string, systemPrompt: string): string {
   const registry = getSkillRegistry();
@@ -66,7 +63,6 @@ function injectRelevantSkills(task: string, systemPrompt: string): string {
 // Alias for backward compatibility
 const getSystemPromptWithXml = getSystemPrompt;
 import { createToolExecutor } from "../../tools/executor.js";
-import { HttpMcpClient } from "../../mcp/http-client.js";
 import { createContextManager } from "../../context/manager.js";
 import { MemoryTier, MessagePriority } from "../../context/types.js";
 import { createHooksManager, CommonHooks } from "../../hooks/manager.js";
@@ -256,43 +252,36 @@ async function initializeLoop(
   // ===========================================================================
 
   // Use provided adapter or create MCP adapter for backward compatibility
-  let adapter: ActionAdapter | undefined = options?.adapter;
+  const adapter: ActionAdapter | undefined = options?.adapter;
   let mcpClient: McpClient & { connect(): Promise<boolean>; disconnect(): void };
 
   if (adapter) {
     // Adapter provided - create a minimal MCP client wrapper for compatibility
     mcpClient = {
       callTool: async (name: string, args: Record<string, unknown>) => {
-        const result = await adapter!.execute(name, args);
+        const result = await adapter.execute(name, args);
         if (!result.success) {
           throw new Error(result.error?.message || "Tool execution failed");
         }
         return result.data;
       },
-      connect: () => adapter!.connect(),
-      disconnect: () => adapter!.disconnect(),
+      connect: () => adapter.connect(),
+      disconnect: () => adapter.disconnect(),
       readResource: async (uri: string) => {
         // Adapters don't have readResource, fall back to getState
-        const state = await adapter!.getState();
+        const state = await adapter.getState();
         return state.data || {};
       },
     } as McpClient & { connect(): Promise<boolean>; disconnect(): void; readResource(uri: string): Promise<unknown> };
+  } else if (options?.mcpClient) {
+    // Legacy MCP client provided for backward compatibility
+    mcpClient = options.mcpClient as McpClient & { connect(): Promise<boolean>; disconnect(): void };
   } else {
-    // No adapter - use legacy MCP client
-    const mcp = options?.mcpClient ?? new HttpMcpClient({
-      baseUrl: config.mcpUrl || process.env.CANVAS_MCP_URL || "http://localhost:3112",
-      canvasId: config.sessionId || sessionId,
-      debug: config.verbose,
-    });
-    mcpClient = mcp as McpClient & { connect(): Promise<boolean>; disconnect(): void };
-
-    // Create MCP adapter wrapper for unified interface
-    if (!config.skipMcpConnection) {
-      adapter = createMCPAdapter({
-        client: mcp as HttpMcpClient,
-        canvasId: config.sessionId || sessionId,
-      });
-    }
+    // No adapter or client provided - throw error
+    // Use createAgentSession() with an adapter instead of runAgenticLoop()
+    throw new Error(
+      "No adapter provided. Use createAgentSession() with an adapter, or provide options.adapter or options.mcpClient."
+    );
   }
 
   // Create tool executor

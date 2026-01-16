@@ -27,8 +27,10 @@ import type { AgentTool, ModelPreference, ModelProvider } from "../../types/inde
 import type { AgentToolName } from "../../tools/generic-definitions.js";
 import type { ToolSet } from "../../tools/ai-sdk-bridge.js";
 import type { LogReporter } from "../log-reporter.js";
-import type { BTCPAgentClient } from "../../btcp/client.js";
 import type { ActionAdapter } from "../../adapters/types.js";
+
+// Browser client is now accessed via ActionAdapter
+// BTCPAgentClient moved to browser-agent module
 
 // ============================================================================
 // BTCP/MCP CLIENT TYPES
@@ -231,7 +233,7 @@ export interface LoopContext {
   // ===========================================================================
 
   /** Browser client (BTCP) - primary tool execution */
-  readonly browserClient?: BTCPAgentClient;
+  readonly browserClient?: BrowserClient;
 
   /**
    * MCP client (legacy, for backward compatibility)
@@ -350,7 +352,7 @@ export type {
   ModelProvider,
   BrowserAwareness,
   LogReporter,
-  BTCPAgentClient,
+  BrowserClient,
   ActionAdapter,
 };
 

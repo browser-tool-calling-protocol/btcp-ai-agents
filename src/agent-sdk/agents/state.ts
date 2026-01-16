@@ -10,7 +10,7 @@
  */
 
 import type { AgentToolName } from "../tools/generic-definitions.js";
-import type { BTCPToolDefinition } from "../btcp/types.js";
+import type { ActionDefinition } from "../adapters/types.js";
 
 // Legacy type alias
 type BrowserToolName = AgentToolName;
@@ -24,7 +24,7 @@ export interface BrowserResource {
   /** Version number (incremented on each change) */
   version: number;
   /** Available browser tools (from BTCP) */
-  availableTools?: BTCPToolDefinition[];
+  availableTools?: ActionDefinition[];
   /** Summary of browser state */
   summary?: BrowserSummary;
   /** Current working context */

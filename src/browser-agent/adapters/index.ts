@@ -24,7 +24,7 @@
  * ```
  */
 
-// Core types and interfaces
+// Core types and interfaces (re-exported from agent-sdk)
 export {
   type ActionAdapter,
   type ActionAdapterRegistry,
@@ -45,7 +45,7 @@ export {
   getAdapterRegistry,
   setAdapterRegistry,
   resetAdapterRegistry,
-} from './types.js';
+} from '../../agent-sdk/adapters/types.js';
 
 // BTCP Adapter (primary)
 export {

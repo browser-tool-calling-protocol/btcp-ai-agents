@@ -67,7 +67,7 @@ export {
   type TaskResult,
   type SessionState,
   type SessionStats,
-} from './session.js';
+} from './agent-sdk/session.js';
 
 // =============================================================================
 // CORE LOOP (Low-level, use Session API instead)
@@ -122,7 +122,7 @@ export {
   type LoopState,
   type LoopOptions,
   type MCPExecutor,
-} from './core/loop/index.js';
+} from './agent-sdk/core/loop/index.js';
 
 // =============================================================================
 // TYPES
@@ -146,16 +146,16 @@ export type {
   ErrorEvent,
   CompleteEvent,
   CancelledEvent,
-} from './agents/types.js';
+} from './agent-sdk/agents/types.js';
 
 export type {
   AgentToolName,
-} from './tools/generic-definitions.js';
+} from './agent-sdk/tools/generic-definitions.js';
 
 export type {
   ModelProvider,
   ModelPreference,
-} from './types/index.js';
+} from './agent-sdk/types/index.js';
 
 // =============================================================================
 // ADAPTERS
@@ -182,7 +182,7 @@ export {
   getAdapterRegistry,
   setAdapterRegistry,
   resetAdapterRegistry,
-} from './adapters/types.js';
+} from './agent-sdk/adapters/types.js';
 
 // =============================================================================
 // PROVIDERS
@@ -192,7 +192,7 @@ export {
   createProvider,
   type LLMProvider,
   type ProviderConfig,
-} from './core/providers/index.js';
+} from './agent-sdk/core/providers/index.js';
 
 // =============================================================================
 // CONTEXT MANAGEMENT
@@ -201,32 +201,32 @@ export {
 export {
   createContextManager,
   type ContextManager,
-} from './context/manager.js';
+} from './agent-sdk/context/manager.js';
 
 export {
   MemoryTier,
   MessagePriority,
   type ContextMessage,
   type ContextStats,
-} from './context/types.js';
+} from './agent-sdk/context/types.js';
 
 export {
   createMessage,
-} from './context/memory.js';
+} from './agent-sdk/context/memory.js';
 
 export {
   ToolResultLifecycle,
   type ToolResultStage,
-} from './context/tool-lifecycle.js';
+} from './agent-sdk/context/tool-lifecycle.js';
 
 export {
   EchoPoisoningPrevention,
-} from './context/echo-prevention.js';
+} from './agent-sdk/context/echo-prevention.js';
 
 export {
   generateSessionId,
   type SessionSerializer,
-} from './context/serialization.js';
+} from './agent-sdk/context/serialization.js';
 
 // =============================================================================
 // HOOKS
@@ -236,14 +236,14 @@ export {
   createHooksManager,
   CommonHooks,
   HooksManager,
-} from './hooks/manager.js';
+} from './agent-sdk/hooks/manager.js';
 
 export type {
   HookType,
   HookContext,
   HookHandler,
   HookResult,
-} from './hooks/types.js';
+} from './agent-sdk/hooks/types.js';
 
 // =============================================================================
 // RESOURCES
@@ -252,17 +252,17 @@ export type {
 export {
   createResourceRegistry,
   ResourceRegistry,
-} from './resources/registry.js';
+} from './agent-sdk/resources/registry.js';
 
 export type {
   ResourceProvider,
   ResourceDefinition,
   ResolvedResource,
-} from './resources/types.js';
+} from './agent-sdk/resources/types.js';
 
 export {
   registerBuiltInProviders,
-} from './resources/providers.js';
+} from './agent-sdk/resources/providers.js';
 
 // =============================================================================
 // SKILLS
@@ -271,11 +271,11 @@ export {
 export {
   getSkillRegistry,
   type SkillRegistry,
-} from './skills/index.js';
+} from './agent-sdk/skills/index.js';
 
 export type {
   SkillDefinition,
-} from './types/index.js';
+} from './agent-sdk/types/index.js';
 
 // =============================================================================
 // TOOLS
@@ -284,17 +284,17 @@ export type {
 export {
   AGENT_TOOL_NAMES,
   GENERIC_TOOL_SCHEMAS,
-} from './tools/generic-definitions.js';
+} from './agent-sdk/tools/generic-definitions.js';
 
 export {
   createToolExecutor,
   type ToolExecutor,
-} from './tools/executor.js';
+} from './agent-sdk/tools/executor.js';
 
 export {
   toolSetToGeminiFormat,
   type ToolSet,
-} from './tools/ai-sdk-bridge.js';
+} from './agent-sdk/tools/ai-sdk-bridge.js';
 
 // =============================================================================
 // STATE
@@ -323,7 +323,7 @@ export {
   type TaskStatus,
   type Checkpoint,
   type TaskError,
-} from './agents/state.js';
+} from './agent-sdk/agents/state.js';
 
 // =============================================================================
 // PLANNING
@@ -331,11 +331,11 @@ export {
 
 export {
   detectAgentMode,
-} from './agents/mode-detection.js';
+} from './agent-sdk/agents/mode-detection.js';
 
 export {
   getSystemPrompt,
-} from './agents/prompts.js';
+} from './agent-sdk/agents/prompts.js';
 
 // =============================================================================
 // CONSTANTS
@@ -344,7 +344,7 @@ export {
 export {
   MODEL_DEFAULTS,
   LOOP_DEFAULTS,
-} from './core/constants.js';
+} from './agent-sdk/core/constants.js';
 
 // =============================================================================
 // UTILITIES
@@ -352,4 +352,4 @@ export {
 
 export {
   extractUserResponse,
-} from './core/response-extractor.js';
+} from './agent-sdk/core/response-extractor.js';

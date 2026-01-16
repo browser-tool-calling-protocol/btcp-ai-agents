@@ -30,7 +30,7 @@ import type {
   ExecuteOptions,
   StateOptions,
   AwarenessOptions,
-} from './types.js';
+} from '../../agent-sdk/adapters/types.js';
 
 // ============================================================================
 // MCP ADAPTER CONFIG

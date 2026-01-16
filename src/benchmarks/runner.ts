@@ -31,14 +31,14 @@ import {
   type SDKResultMessage,
   isPartialMessage,
   isResultMessage,
-} from "../core/index.js";
+} from "../agent-sdk/core/index.js";
 import type {
   AgentEvent,
   ActingEvent,
   ObservingEvent,
   CompleteEvent,
   ContextEvent,
-} from "../agents/types.js";
+} from "../agent-sdk/agents/types.js";
 
 // Type guard helpers for AgentEvent (from agents/types.ts)
 function isActingEvent(event: AgentEvent): event is ActingEvent {

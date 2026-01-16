@@ -2,18 +2,18 @@
  * Agent Types
  *
  * Type definitions for the streaming agent architecture.
- * Updated to use browser/session terminology for BTCP integration.
+ * Domain-agnostic types for the core agent framework.
  *
  * Enhanced with full integration support for:
  * - ContextManager (tiered memory)
  * - HooksManager (pre/post hooks)
  * - ResourceRegistry (@alias resolution)
  * - SessionSerializer (persistence)
- * - BTCPAgentClient (browser tool execution)
+ * - ActionAdapter (domain-specific tool execution)
  */
 
 import type { AgentToolName } from "../tools/generic-definitions.js";
-import type { BTCPAgentClient } from "../btcp/client.js";
+import type { ActionAdapter } from "../adapters/types.js";
 
 // Tool result type
 interface ToolResult {
@@ -549,10 +549,10 @@ export interface AgentConfig {
   enabledTools?: BrowserToolName[];
 
   /**
-   * BTCP agent client for browser tool execution.
-   * If not provided, a default client will be created using btcpUrl.
+   * Action adapter for tool execution.
+   * Provides domain-specific capabilities (browser, canvas, API, etc.)
    */
-  btcpClient?: BTCPAgentClient;
+  adapter?: ActionAdapter;
 }
 
 /**

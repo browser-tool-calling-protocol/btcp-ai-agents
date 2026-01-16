@@ -12,7 +12,7 @@
  * - Connection pooling ready
  */
 
-import type { McpClient } from "../core/loop/types.js";
+import type { McpClient } from "../../agent-sdk/core/loop/types.js";
 
 // ============================================================================
 // Retry and Circuit Breaker Configuration

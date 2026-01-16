@@ -58,7 +58,7 @@ export {
   createBTCPAdapter,
   createBTCPAdapterFromClient,
   type BTCPAdapterConfig,
-} from './adapters/btcp-adapter.js';
+} from './browser-agent/adapters/btcp-adapter.js';
 
 // =============================================================================
 // MCP ADAPTER (Legacy)
@@ -69,7 +69,7 @@ export {
   createMCPAdapter,
   createMCPAdapterFromClient,
   type MCPAdapterConfig,
-} from './adapters/mcp-adapter.js';
+} from './browser-agent/adapters/mcp-adapter.js';
 
 // =============================================================================
 // BTCP CLIENT
@@ -79,7 +79,7 @@ export {
   BTCPAgentClient,
   createBTCPClient,
   type ToolHandler,
-} from './btcp/client.js';
+} from './browser-agent/btcp/client.js';
 
 export {
   BTCPError,
@@ -94,7 +94,7 @@ export {
   type BTCPSession,
   type BrowserToolInput,
   type BrowserToolResult,
-} from './btcp/types.js';
+} from './browser-agent/btcp/types.js';
 
 // =============================================================================
 // MCP CLIENT (Legacy)
@@ -106,7 +106,7 @@ export {
   checkMcpHealth,
   type HttpMcpClientConfig,
   type RetryConfig,
-} from './mcp/http-client.js';
+} from './browser-agent/mcp/http-client.js';
 
 // =============================================================================
 // BROWSER TOOL FACTORY
@@ -117,7 +117,7 @@ export {
   createBrowserToolSet,
   formatBrowserToolsForPrompt,
   type BrowserToolOptions,
-} from './btcp/browser-tool.js';
+} from './browser-agent/btcp/browser-tool.js';
 
 // =============================================================================
 // HTTP HANDLER
@@ -132,7 +132,7 @@ export {
   createChatRouter,
   type ChatRequest,
   type CommandRequest,
-} from './http/handler.js';
+} from './browser-agent/http/handler.js';
 
 // =============================================================================
 // RE-EXPORT CORE SDK
