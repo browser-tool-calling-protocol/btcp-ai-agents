@@ -7,7 +7,7 @@
  * ## Usage
  *
  * ```typescript
- * import { createAgentSession } from '@btcp/ai-agents/agent-sdk';
+ * import { createAgentSession } from '@btcp/ai-agents/core';
  * import { createBTCPAdapter } from '@btcp/ai-agents/browser-agent';
  *
  * // Create session

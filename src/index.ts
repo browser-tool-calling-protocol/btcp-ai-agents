@@ -44,7 +44,7 @@
 // =============================================================================
 
 // Re-export the core module for convenience
-import * as coreModule from "./agent-sdk/core/index.js";
+import * as coreModule from "./core/core/index.js";
 export { coreModule as core };
 export { coreModule as sdk };
 
@@ -121,7 +121,7 @@ export {
   MODEL_DEFAULTS,
   createToolResultMessage,
   buildMessages,
-} from "./agent-sdk/core/index.js";
+} from "./core/core/index.js";
 
 // =============================================================================
 // GENERIC AGENTS
@@ -169,13 +169,13 @@ export {
   getModeConfidence,
   detectAllModes,
   MODE_DESCRIPTIONS,
-} from "./agent-sdk/agents/index.js";
+} from "./core/agents/index.js";
 
 // =============================================================================
 // GENERIC TOOLS
 // =============================================================================
 
-export * from "./agent-sdk/tools/index.js";
+export * from "./core/tools/index.js";
 
 // =============================================================================
 // SKILLS (Pluggable Registry)
@@ -189,7 +189,7 @@ export {
   type SkillRegistry,
   type SkillInjectionConfig,
   type SkillInjectionResult,
-} from "./agent-sdk/skills/index.js";
+} from "./core/skills/index.js";
 
 // =============================================================================
 // ACTION ADAPTERS
@@ -250,15 +250,15 @@ export type {
   ChatMessage,
   ChatHandlerConfig,
   AgentTool,
-} from "./agent-sdk/types/index.js";
+} from "./core/types/index.js";
 
 // Re-export with aliases to avoid conflicts
-export type { AgentResources as CoreAgentResources } from "./agent-sdk/types/index.js";
-export type { TaskStatus as CoreTaskStatus } from "./agent-sdk/types/index.js";
-export type { ToolDefinition as SimpleToolDefinition } from "./agent-sdk/types/index.js";
+export type { AgentResources as CoreAgentResources } from "./core/types/index.js";
+export type { TaskStatus as CoreTaskStatus } from "./core/types/index.js";
+export type { ToolDefinition as SimpleToolDefinition } from "./core/types/index.js";
 
 // Export schemas and constants from types
-export { chatMessageSchema, chatRequestSchema } from "./agent-sdk/types/index.js";
+export { chatMessageSchema, chatRequestSchema } from "./core/types/index.js";
 
 // =============================================================================
 // UTILITIES
@@ -314,7 +314,7 @@ export {
   type TaskResult,
   type SessionState,
   type SessionStats,
-} from "./agent-sdk/session.js";
+} from "./core/session.js";
 
 // =============================================================================
 // AGENTIC LOOP (Low-level, deprecated)
@@ -329,7 +329,7 @@ export {
   type LoopState,
   type LoopOptions,
   type ActionAdapter,
-} from "./agent-sdk/core/loop/index.js";
+} from "./core/core/loop/index.js";
 
 // =============================================================================
 // ADAPTERS (Extended)
@@ -366,7 +366,7 @@ export {
 // =============================================================================
 
 // Agent SDK - core domain-agnostic framework
-export * as agentSdk from "./agent-sdk.js";
+export * as agentSdk from "./core.js";
 
 // Browser Agent - browser-specific integration
 export * as browserAgent from "./browser-agent.js";
@@ -375,16 +375,16 @@ export * as browserAgent from "./browser-agent.js";
 export * as btcp from "./browser-agent/btcp/index.js";
 
 // Context management system - token budgeting, tiered memory, compression
-export * as context from "./agent-sdk/context/index.js";
+export * as context from "./core/context/index.js";
 
 // Hooks system - observability, metrics, lifecycle hooks
-export * as hooks from "./agent-sdk/hooks/index.js";
+export * as hooks from "./core/hooks/index.js";
 
 // Aliases system - @alias syntax for referencing data
 export * as aliases from "./aliases/index.js";
 
 // Resources system - unified data access for agents
-export * as resources from "./agent-sdk/resources/index.js";
+export * as resources from "./core/resources/index.js";
 
 // Commands system - slash command support
 export * as commands from "./commands/index.js";

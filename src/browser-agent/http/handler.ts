@@ -12,7 +12,7 @@
 
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { createSession, type Session } from "../../agent-sdk/core/session.js";
+import { createSession, type Session } from "../../core/core/session.js";
 import type {
   SDKMessage,
   SDKResultMessage,
@@ -20,13 +20,13 @@ import type {
   SDKSystemMessage,
   SDKAssistantMessage,
   SDKPermissionDenialMessage,
-} from "../../agent-sdk/core/messages.js";
-import type { AgentMode } from "../../agent-sdk/agents/types.js";
-import type { AgentEvent } from "../../agent-sdk/types/index.js";
-import type { SDKMessageUnion } from "../../agent-sdk/core/messages.js";
-import { getSystemPrompt } from "../../agent-sdk/agents/prompts.js";
-import { detectAgentMode } from "../../agent-sdk/agents/mode-detection.js";
-import { getSkillRegistry } from "../../agent-sdk/skills/index.js";
+} from "../../core/core/messages.js";
+import type { AgentMode } from "../../core/agents/types.js";
+import type { AgentEvent } from "../../core/types/index.js";
+import type { SDKMessageUnion } from "../../core/core/messages.js";
+import { getSystemPrompt } from "../../core/agents/prompts.js";
+import { detectAgentMode } from "../../core/agents/mode-detection.js";
+import { getSkillRegistry } from "../../core/skills/index.js";
 
 // Legacy alias
 const getSystemPromptWithXml = getSystemPrompt;
@@ -37,7 +37,7 @@ function injectRelevantSkills(task: string, systemPrompt: string): string {
   const result = registry.injectSkills(task, systemPrompt);
   return result.injectedPrompt;
 }
-import { getUserFriendlyMessage } from "../../agent-sdk/tools/error-codes.js";
+import { getUserFriendlyMessage } from "../../core/tools/error-codes.js";
 
 // ============================================================================
 // AI SDK Stream Protocol Conversion

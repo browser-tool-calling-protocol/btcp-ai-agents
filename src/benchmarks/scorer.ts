@@ -28,7 +28,7 @@ import {
   generateRecommendations,
 } from "./metrics.js";
 
-import { extractReasoning, extractUserResponse } from "../agent-sdk/core/response-extractor.js";
+import { extractReasoning, extractUserResponse } from "../core/core/response-extractor.js";
 
 // ============================================================================
 // SCORER CLASS

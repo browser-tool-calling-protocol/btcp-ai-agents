@@ -45,7 +45,7 @@ export {
   getAdapterRegistry,
   setAdapterRegistry,
   resetAdapterRegistry,
-} from '../../agent-sdk/adapters/types.js';
+} from '../../core/adapters/types.js';
 
 // BTCP Adapter (primary)
 export {

@@ -156,4 +156,4 @@ export {
   type AgentConfig,
   type LoopOptions,
   type ActionAdapter,
-} from './agent-sdk.js';
+} from './core.js';
