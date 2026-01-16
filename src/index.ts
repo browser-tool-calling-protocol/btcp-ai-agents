@@ -300,9 +300,29 @@ export {
 } from "./btcp/index.js";
 
 // =============================================================================
-// AGENTIC LOOP (Primary Entry Point)
+// AGENT SESSION API (Primary Entry Point)
 // =============================================================================
 
+export {
+  // Session API (Primary)
+  AgentSession,
+  createAgentSession,
+  createCancellationToken,
+  runTask,
+  streamTask,
+  type AgentSessionConfig,
+  type TaskResult,
+  type SessionState,
+  type SessionStats,
+} from "./session.js";
+
+// =============================================================================
+// AGENTIC LOOP (Low-level, deprecated)
+// =============================================================================
+
+/**
+ * @deprecated Use `createAgentSession` and `session.run()` instead.
+ */
 export {
   runAgenticLoop,
   type LoopContext,

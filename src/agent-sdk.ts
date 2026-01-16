@@ -4,9 +4,34 @@
  * Domain-agnostic agentic framework inspired by Claude Code patterns.
  * This is the core SDK that can be used with any domain adapter.
  *
+ * ## Quick Start
+ *
+ * ```typescript
+ * import { createAgentSession, createBTCPAdapter } from '@btcp/ai-agents';
+ *
+ * // Create session with adapter
+ * const session = await createAgentSession({
+ *   adapter: createBTCPAdapter({ serverUrl: 'http://localhost:8765' }),
+ *   model: 'balanced',
+ * });
+ *
+ * // Run tasks (streaming)
+ * for await (const event of session.run("Click the login button")) {
+ *   console.log(event.type, event);
+ * }
+ *
+ * // Or execute and get result
+ * const result = await session.execute("Fill in the form");
+ * console.log(result.success, result.summary);
+ *
+ * // Cleanup
+ * await session.close();
+ * ```
+ *
  * ## Architecture
  *
  * The agent SDK provides:
+ * - Session-based API (primary interface)
  * - TOAD Loop (Think → Act → Observe → Decide)
  * - LLM Providers (Google Gemini, OpenAI)
  * - Context Management (6-tier memory, compression)
@@ -14,27 +39,6 @@
  * - Resource Registry (@alias resolution)
  * - Skills System (knowledge injection)
  * - Planning & Delegation
- *
- * ## Usage
- *
- * ```typescript
- * import {
- *   runAgenticLoop,
- *   createBTCPAdapter,
- *   type AgentEvent,
- * } from '@btcp/ai-agents/agent-sdk';
- *
- * // Create an adapter for your domain
- * const adapter = createBTCPAdapter({ serverUrl: 'http://localhost:8765' });
- *
- * // Run the agent loop
- * for await (const event of runAgenticLoop("Your task", "session-id", {
- *   adapter,
- *   model: "balanced",
- * })) {
- *   console.log(event.type, event);
- * }
- * ```
  *
  * ## Extension Points
  *
@@ -47,11 +51,49 @@
  */
 
 // =============================================================================
-// CORE LOOP
+// SESSION API (Primary Interface)
 // =============================================================================
 
 export {
-  // Main entry point
+  // Session class and factory
+  AgentSession,
+  createAgentSession,
+  createCancellationToken,
+  // Convenience functions
+  runTask,
+  streamTask,
+  // Types
+  type AgentSessionConfig,
+  type TaskResult,
+  type SessionState,
+  type SessionStats,
+} from './session.js';
+
+// =============================================================================
+// CORE LOOP (Low-level, use Session API instead)
+// =============================================================================
+
+/**
+ * @deprecated Use `createAgentSession` and `session.run()` instead.
+ *
+ * The session-based API provides:
+ * - Automatic connection management
+ * - Multi-turn context preservation
+ * - Cleaner async/await patterns
+ * - Built-in statistics and history
+ *
+ * Migration:
+ * ```typescript
+ * // Before (deprecated)
+ * for await (const event of runAgenticLoop(task, sessionId, options)) { ... }
+ *
+ * // After (recommended)
+ * const session = await createAgentSession({ adapter, ...options });
+ * for await (const event of session.run(task)) { ... }
+ * await session.close();
+ * ```
+ */
+export {
   runAgenticLoop,
   // Phase functions (for testing/customization)
   think,

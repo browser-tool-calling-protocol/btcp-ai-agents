@@ -2,12 +2,42 @@
 
 This document describes the architecture of the `@btcp/ai-agents` package, which provides a Claude Code-level agentic framework with clean separation between core agent functionality and domain-specific integrations.
 
+## Quick Start
+
+```typescript
+import { createAgentSession, createBTCPAdapter } from '@btcp/ai-agents';
+
+// Create session with adapter
+const session = await createAgentSession({
+  adapter: createBTCPAdapter({ serverUrl: 'http://localhost:8765' }),
+  model: 'balanced',
+});
+
+// Run tasks (streaming)
+for await (const event of session.run("Click the login button")) {
+  console.log(event.type, event);
+}
+
+// Or execute and get result
+const result = await session.execute("Fill in the form");
+console.log(result.success, result.summary);
+
+// Multi-turn: context is preserved
+for await (const event of session.run("Now submit")) {
+  console.log(event);
+}
+
+// Cleanup
+await session.close();
+```
+
 ## Package Structure
 
 ```
 @btcp/ai-agents
 ├── agent-sdk       # Core domain-agnostic framework
-│   ├── core/loop   # TOAD (Think-Act-Observe-Decide) loop
+│   ├── session     # Session-based API (PRIMARY INTERFACE)
+│   ├── core/loop   # TOAD loop (low-level, deprecated)
 │   ├── providers   # LLM providers (Google, OpenAI)
 │   ├── context     # Memory management (6-tier)
 │   ├── hooks       # Pre/post execution hooks
@@ -83,23 +113,21 @@ The agentic loop follows the Think-Act-Observe-Decide pattern:
 
 ## Usage Patterns
 
-### Basic Usage with Adapter
+### Session-based API (Recommended)
 
 ```typescript
-import { runAgenticLoop } from '@btcp/ai-agents/agent-sdk';
+import { createAgentSession } from '@btcp/ai-agents';
 import { createBTCPAdapter } from '@btcp/ai-agents/browser-agent';
 
-// Create adapter for browser tools
-const adapter = createBTCPAdapter({
-  serverUrl: 'http://localhost:8765',
-  sessionId: 'my-session',
+// Create session with adapter
+const session = await createAgentSession({
+  adapter: createBTCPAdapter({ serverUrl: 'http://localhost:8765' }),
+  model: 'balanced',
+  verbose: true,
 });
 
-// Run agent loop
-for await (const event of runAgenticLoop("Click the login button", "session-1", {
-  adapter,
-  model: "balanced",
-})) {
+// Stream events from a task
+for await (const event of session.run("Click the login button")) {
   switch (event.type) {
     case 'thinking':
       console.log('Thinking:', event.message);
@@ -111,6 +139,35 @@ for await (const event of runAgenticLoop("Click the login button", "session-1", 
       console.log('Done:', event.summary);
       break;
   }
+}
+
+// Execute and get result (no streaming)
+const result = await session.execute("Fill in the form");
+if (result.success) {
+  console.log('Summary:', result.summary);
+  console.log('Duration:', result.duration, 'ms');
+}
+
+// Get session stats
+console.log('Stats:', session.getStats());
+
+// Cleanup
+await session.close();
+```
+
+### Convenience Functions
+
+```typescript
+import { runTask, streamTask, createBTCPAdapter } from '@btcp/ai-agents';
+
+const adapter = createBTCPAdapter({ serverUrl: 'http://localhost:8765' });
+
+// Single task with result (creates/closes session automatically)
+const result = await runTask("Click the button", adapter, { model: 'fast' });
+
+// Single task with streaming
+for await (const event of streamTask("Fill form", adapter)) {
+  console.log(event);
 }
 ```
 

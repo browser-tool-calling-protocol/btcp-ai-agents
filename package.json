@@ -20,6 +20,7 @@
     },
     "./agent-sdk": "./src/agent-sdk.ts",
     "./browser-agent": "./src/browser-agent.ts",
+    "./session": "./src/session.ts",
     "./sdk": "./src/core/index.ts",
     "./agents": "./src/agents/index.ts",
     "./core": "./src/core/index.ts",
