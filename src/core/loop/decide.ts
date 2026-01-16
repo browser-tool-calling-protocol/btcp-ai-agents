@@ -173,7 +173,7 @@ export function createDecisionEvents(
         type: "complete",
         timestamp: Date.now(),
         summary: decision.summary,
-        elementsAffected: state.resources.canvas.version,
+        elementsAffected: state.resources.browser.version,
         totalDuration: Date.now() - startTime,
       });
       break;

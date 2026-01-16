@@ -152,7 +152,7 @@ export async function thinkTestMode(
 
   // Mock awareness - consistent with createMockAwareness
   const awareness: CanvasAwareness = {
-    summary: `Canvas "${ctx.canvasId}" is empty. Use canvas_read to get current state, canvas_write to create elements.`,
+    summary: `Session "${ctx.sessionId}" is ready. Use context_read to get current state, task_execute to perform actions.`,
     tokensUsed: 100,
     skeleton: [],
     relevant: [],
