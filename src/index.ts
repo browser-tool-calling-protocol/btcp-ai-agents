@@ -300,8 +300,56 @@ export {
 } from "./btcp/index.js";
 
 // =============================================================================
+// AGENTIC LOOP (Primary Entry Point)
+// =============================================================================
+
+export {
+  runAgenticLoop,
+  type LoopContext,
+  type LoopState,
+  type LoopOptions,
+  type ActionAdapter,
+} from "./core/loop/index.js";
+
+// =============================================================================
+// ADAPTERS (Extended)
+// =============================================================================
+
+export {
+  // BTCP Adapter (Primary)
+  BTCPAdapter,
+  createBTCPAdapter,
+  createBTCPAdapterFromClient,
+  type BTCPAdapterConfig,
+  // MCP Adapter (Legacy)
+  MCPAdapter,
+  createMCPAdapter,
+  createMCPAdapterFromClient,
+  type MCPAdapterConfig,
+  // Types
+  type ActionResult,
+  type ActionError,
+  type ActionMetadata,
+  type ActionDefinition,
+  type AdapterConnectionState,
+  type StateSnapshot,
+  type AwarenessContext,
+  type ExecuteOptions,
+  type StateOptions,
+  type AwarenessOptions,
+  NoOpAdapter,
+  resetAdapterRegistry,
+} from "./adapters/index.js";
+
+// =============================================================================
 // NAMESPACE EXPORTS (Module organization)
 // =============================================================================
+
+// Agent SDK - core domain-agnostic framework
+export * as agentSdk from "./agent-sdk.js";
+
+// Browser Agent - browser-specific integration
+export * as browserAgent from "./browser-agent.js";
 
 // BTCP module - browser tool calling protocol
 export * as btcp from "./btcp/index.js";
