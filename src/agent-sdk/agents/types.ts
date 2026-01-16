@@ -2,18 +2,18 @@
  * Agent Types
  *
  * Type definitions for the streaming agent architecture.
- * Updated to use browser/session terminology for BTCP integration.
+ * Domain-agnostic types for the core agent framework.
  *
  * Enhanced with full integration support for:
  * - ContextManager (tiered memory)
  * - HooksManager (pre/post hooks)
  * - ResourceRegistry (@alias resolution)
  * - SessionSerializer (persistence)
- * - BTCPAgentClient (browser tool execution)
+ * - ActionAdapter (domain-specific tool execution)
  */
 
 import type { AgentToolName } from "../tools/generic-definitions.js";
-import type { BTCPAgentClient } from "../btcp/client.js";
+import type { ActionAdapter } from "../adapters/types.js";
 
 // Tool result type
 interface ToolResult {
@@ -24,8 +24,6 @@ interface ToolResult {
 
 // Type alias for browser tools
 type BrowserToolName = AgentToolName;
-/** @deprecated Use BrowserToolName instead */
-type CanvasToolName = BrowserToolName;
 import type { AgentResources } from "./state.js";
 import type { ContextManager } from "../context/manager.js";
 import type { HooksManager } from "../hooks/manager.js";
@@ -38,8 +36,18 @@ import type { SubAgentType } from "../core/delegation.js";
  * Extended with alias, checkpoint, and delegation events
  */
 export type AgentEventType =
+  // Core TOAD loop events (documented in ARCHITECTURE.md)
+  | "iteration"
   | "thinking"
+  | "tool_call"
+  | "tool_result"
+  | "observation"
+  | "decision"
   | "context"
+  | "error"
+  | "complete"
+  | "cancelled"
+  // Extended events
   | "reasoning"
   | "plan"
   | "step_start"
@@ -47,13 +55,10 @@ export type AgentEventType =
   | "acting"
   | "observing"
   | "blocked"
-  | "error"
   | "recovery"
-  | "complete"
   | "failed"
   | "timeout"
-  | "cancelled"
-  // New event types for full integration
+  // Alias and checkpoint events
   | "alias_resolving"
   | "alias_resolved"
   | "checkpoint"
@@ -64,10 +69,7 @@ export type AgentEventType =
   | "context_injected"
   | "correction"
   // Human-in-the-loop events
-  | "clarification_needed"
-  // Tool events
-  | "tool_call"
-  | "tool_result";
+  | "clarification_needed";
 
 /**
  * Base event structure
@@ -79,11 +81,24 @@ interface BaseAgentEvent {
 }
 
 /**
+ * Iteration event - new TOAD loop iteration started
+ */
+export interface IterationEvent extends BaseAgentEvent {
+  type: "iteration";
+  /** Current iteration number (1-based) */
+  iteration: number;
+  /** Maximum iterations allowed */
+  maxIterations: number;
+}
+
+/**
  * Thinking event - agent is analyzing
  */
 export interface ThinkingEvent extends BaseAgentEvent {
   type: "thinking";
   message?: string;
+  /** Reasoning process */
+  reasoning?: string;
 }
 
 /**
@@ -353,14 +368,54 @@ export interface ToolResultEvent extends BaseAgentEvent {
   tool: unknown;
   /** Tool result */
   result?: unknown;
+  /** Call ID for correlation */
+  callId?: string;
+  /** Duration in milliseconds */
+  duration?: number;
+}
+
+/**
+ * Observation event - agent processed tool results
+ */
+export interface ObservationEvent extends BaseAgentEvent {
+  type: "observation";
+  /** Observations from tool results */
+  observations: Array<{
+    tool: string;
+    summary: string;
+    success: boolean;
+  }>;
+}
+
+/**
+ * Decision event - agent decided next action
+ */
+export interface DecisionEvent extends BaseAgentEvent {
+  type: "decision";
+  /** Decision made: continue, complete, or fail */
+  decision: "continue" | "complete" | "fail";
+  /** Reason for the decision */
+  reason: string;
+  /** Next tool to call (if continuing) */
+  nextTool?: string;
 }
 
 /**
  * Union of all agent events
  */
 export type AgentEvent =
+  // Core TOAD loop events (documented in ARCHITECTURE.md)
+  | IterationEvent
   | ThinkingEvent
+  | ToolCallEvent
+  | ToolResultEvent
+  | ObservationEvent
+  | DecisionEvent
   | ContextEvent
+  | ErrorEvent
+  | CompleteEvent
+  | CancelledEvent
+  // Extended events
   | ReasoningEvent
   | PlanEvent
   | StepStartEvent
@@ -368,13 +423,10 @@ export type AgentEvent =
   | ActingEvent
   | ObservingEvent
   | BlockedEvent
-  | ErrorEvent
   | RecoveryEvent
-  | CompleteEvent
   | FailedEvent
   | TimeoutEvent
-  | CancelledEvent
-  // Alias events
+  // Alias and checkpoint events
   | AliasResolvingEvent
   | AliasResolvedEvent
   | CheckpointEvent
@@ -385,10 +437,7 @@ export type AgentEvent =
   | ContextInjectedEvent
   | CorrectionEvent
   // Human-in-the-loop events
-  | ClarificationNeededEvent
-  // Tool events
-  | ToolCallEvent
-  | ToolResultEvent;
+  | ClarificationNeededEvent;
 
 /**
  * Agent configuration
@@ -500,10 +549,10 @@ export interface AgentConfig {
   enabledTools?: BrowserToolName[];
 
   /**
-   * BTCP agent client for browser tool execution.
-   * If not provided, a default client will be created using btcpUrl.
+   * Action adapter for tool execution.
+   * Provides domain-specific capabilities (browser, canvas, API, etc.)
    */
-  btcpClient?: BTCPAgentClient;
+  adapter?: ActionAdapter;
 }
 
 /**

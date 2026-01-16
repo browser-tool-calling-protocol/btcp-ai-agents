@@ -35,6 +35,7 @@ import type {
   CancellationToken,
   McpClient,
   AgentToolName,
+  ActionAdapter,
 } from "./types.js";
 
 // Phase imports
@@ -62,7 +63,6 @@ function injectRelevantSkills(task: string, systemPrompt: string): string {
 // Alias for backward compatibility
 const getSystemPromptWithXml = getSystemPrompt;
 import { createToolExecutor } from "../../tools/executor.js";
-import { HttpMcpClient } from "../../mcp/http-client.js";
 import { createContextManager } from "../../context/manager.js";
 import { MemoryTier, MessagePriority } from "../../context/types.js";
 import { createHooksManager, CommonHooks } from "../../hooks/manager.js";
@@ -89,6 +89,8 @@ export { createCanvasTools, executeToolWithHooks } from "./tools.js";
 export {
   getAwarenessWithCaching,
   fetchAwarenessFromMcp,
+  fetchAwarenessFromAdapter,
+  fetchAwareness,
   fetchCanvasSnapshot,
   formatCanvasForContext,
   formatTasksForContext,
@@ -96,6 +98,9 @@ export {
   injectCanvasContextForIteration,
   handleMutationToolEffect,
 } from "./context.js";
+
+// Re-export adapter types
+export type { ActionAdapter } from "./types.js";
 
 // ============================================================================
 // INITIALIZATION
@@ -137,16 +142,19 @@ function initializeIntegrationSystems(
 
 /**
  * Initialize loop context and state
+ *
+ * @param task - The task to execute
+ * @param sessionId - Session identifier (previously canvasId for backward compat)
  */
 async function initializeLoop(
   task: string,
-  canvasId: string,
+  sessionId: string,
   options?: LoopOptions,
   cancellation?: CancellationToken
 ): Promise<{ ctx: LoopContext; state: LoopState; delegationEvents: AgentEvent[] }> {
   // Merge options into config
   const config: AgentConfig = {
-    canvasId,
+    sessionId,
     ...options,
   };
 
@@ -194,7 +202,7 @@ async function initializeLoop(
     });
 
     const aliasResult = await resourceRegistry.resolveAliases(task, {
-      canvasId: config.canvasId,
+      sessionId: config.sessionId,
     });
 
     aliasEvents.push({
@@ -239,16 +247,46 @@ async function initializeLoop(
   // Add system prompt to context manager
   contextManager.addSystemMessage(systemPrompt);
 
-  // Initialize MCP client
-  const mcpClient = options?.mcpClient ?? new HttpMcpClient({
-    baseUrl: config.mcpUrl || process.env.CANVAS_MCP_URL || "http://localhost:3112",
-    canvasId: config.canvasId,
-    debug: config.verbose,
-  });
+  // ===========================================================================
+  // ADAPTER & CLIENT INITIALIZATION
+  // ===========================================================================
+
+  // Use provided adapter or create MCP adapter for backward compatibility
+  const adapter: ActionAdapter | undefined = options?.adapter;
+  let mcpClient: McpClient & { connect(): Promise<boolean>; disconnect(): void };
+
+  if (adapter) {
+    // Adapter provided - create a minimal MCP client wrapper for compatibility
+    mcpClient = {
+      callTool: async (name: string, args: Record<string, unknown>) => {
+        const result = await adapter.execute(name, args);
+        if (!result.success) {
+          throw new Error(result.error?.message || "Tool execution failed");
+        }
+        return result.data;
+      },
+      connect: () => adapter.connect(),
+      disconnect: () => adapter.disconnect(),
+      readResource: async (uri: string) => {
+        // Adapters don't have readResource, fall back to getState
+        const state = await adapter.getState();
+        return state.data || {};
+      },
+    } as McpClient & { connect(): Promise<boolean>; disconnect(): void; readResource(uri: string): Promise<unknown> };
+  } else if (options?.mcpClient) {
+    // Legacy MCP client provided for backward compatibility
+    mcpClient = options.mcpClient as McpClient & { connect(): Promise<boolean>; disconnect(): void };
+  } else {
+    // No adapter or client provided - throw error
+    // Use createAgentSession() with an adapter instead of runAgenticLoop()
+    throw new Error(
+      "No adapter provided. Use createAgentSession() with an adapter, or provide options.adapter or options.mcpClient."
+    );
+  }
 
   // Create tool executor
   const executor = createToolExecutor({
-    canvasId: config.canvasId,
+    canvasId: config.sessionId || sessionId,
     sessionId,
     mcp: mcpClient,
     hooks: {
@@ -292,7 +330,6 @@ async function initializeLoop(
   const ctx: LoopContext = {
     task,
     resolvedTask,
-    canvasId,
     sessionId,
     config,
     options: options || {},
@@ -305,6 +342,9 @@ async function initializeLoop(
     sessionSerializer,
     toolLifecycle,
     echoPrevention,
+    // Adapter (primary) for domain-agnostic operation
+    adapter,
+    // Legacy MCP client (for backward compatibility)
     mcpClient: mcpClient as McpClient & { connect(): Promise<boolean>; disconnect(): void },
     tools,
     llmProvider,
@@ -323,8 +363,9 @@ async function initializeLoop(
     taskState: [],
     taskStateUpdatedAt: undefined,
     resources: {
-      canvas: {
-        id: canvasId,
+      // Use browser terminology but store sessionId
+      browser: {
+        id: sessionId,
         version: 0,
       },
       task: {
@@ -364,20 +405,35 @@ async function initializeLoop(
 // ============================================================================
 
 /**
- * Canvas Agentic Loop
+ * Agentic Loop
  *
- * Main entry point for canvas agent execution.
+ * Main entry point for agent execution.
  * Implements the THINK → ACT → OBSERVE → DECIDE loop pattern.
+ *
+ * The second parameter is `sessionId` (historically called `canvasId` for
+ * backward compatibility). It identifies the session for state management.
+ *
+ * @param task - The task to execute
+ * @param sessionId - Session identifier (alias: canvasId for backward compat)
+ * @param options - Loop configuration options
+ * @param cancellation - Optional cancellation token
  *
  * @example
  * ```typescript
- * const token = createCancellationToken();
+ * // Using adapter (recommended)
+ * const adapter = createBTCPAdapter({ serverUrl: 'http://localhost:8765' });
  *
+ * for await (const event of runAgenticLoop("Create a flowchart", "my-session", {
+ *   adapter,
+ *   model: "balanced",
+ * })) {
+ *   console.log(event.type, event);
+ * }
+ *
+ * // Legacy (without adapter)
  * for await (const event of runAgenticLoop("Create a flowchart", "my-canvas", {
  *   model: "balanced",
- * }, token)) {
- *   console.log(event.type, event);
- *
+ * })) {
  *   if (event.type === "complete") {
  *     console.log("Done:", event.summary);
  *   }
@@ -386,7 +442,7 @@ async function initializeLoop(
  */
 export async function* runAgenticLoop(
   task: string,
-  canvasId: string,
+  sessionId: string,
   options?: LoopOptions,
   cancellation?: CancellationToken
 ): AsyncGenerator<AgentEvent> {
@@ -394,7 +450,7 @@ export async function* runAgenticLoop(
   // Initialize context and state
   const { ctx, state, delegationEvents } = await initializeLoop(
     task,
-    canvasId,
+    sessionId,
     options,
     cancellation
   );
@@ -486,7 +542,7 @@ export async function* runAgenticLoop(
           type: "complete",
           timestamp: Date.now(),
           summary: `Test mode completed for: ${ctx.resolvedTask}`,
-          elementsAffected: state.resources.canvas.version,
+          elementsAffected: state.resources.browser.version,
           totalDuration: Date.now() - state.startTime,
         };
         return;
@@ -680,7 +736,7 @@ export async function* runAgenticLoop(
     try {
       ctx.mcpClient.disconnect();
 
-      if (ctx.sessionSerializer && state.resources.canvas.version > 0) {
+      if (ctx.sessionSerializer && state.resources.browser.version > 0) {
         try {
           await ctx.sessionSerializer.save(ctx.contextManager, ctx.sessionId);
         } catch (checkpointError) {

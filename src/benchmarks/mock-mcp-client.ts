@@ -6,7 +6,7 @@
  * the LLM's tool calling decisions without network dependencies.
  */
 
-import type { McpClient } from "../core/loop/types.js";
+import type { McpClient } from "../agent-sdk/core/loop/types.js";
 
 /**
  * Canvas state for mock operations

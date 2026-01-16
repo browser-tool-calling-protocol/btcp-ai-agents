@@ -136,6 +136,8 @@ export type BTCPToolResultContent =
 export interface BTCPToolResult {
   content: BTCPToolResultContent[];
   isError?: boolean;
+  /** Optional metadata about the tool execution */
+  metadata?: Record<string, unknown>;
 }
 
 /**

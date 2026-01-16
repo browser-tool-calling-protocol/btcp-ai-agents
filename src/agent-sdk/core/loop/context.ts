@@ -3,6 +3,8 @@
  *
  * Handles canvas awareness, context injection, and message formatting
  * for the agentic loop.
+ *
+ * Updated to support ActionAdapter for domain-agnostic operation.
  */
 
 import type {
@@ -13,6 +15,7 @@ import type {
   ContextManager,
   McpClient,
   StateSnapshotOutput,
+  ActionAdapter,
 } from "./types.js";
 import type { ContextOptions } from "../../agents/context-builder.js";
 import { MemoryTier, MessagePriority } from "../../context/types.js";
@@ -36,9 +39,9 @@ type CanvasSnapshotOutput = StateSnapshotOutput;
 /**
  * Mock awareness for test mode
  */
-export function createMockAwareness(canvasId: string): CanvasAwareness {
+export function createMockAwareness(sessionId: string): CanvasAwareness {
   return {
-    summary: `Canvas "${canvasId}" is empty. Use canvas_read to get current state, canvas_write to create elements.`,
+    summary: `Session "${sessionId}" is ready. Use context_read to get current state, task_execute to perform actions.`,
     tokensUsed: 100,
     skeleton: [],
     relevant: [],
@@ -47,21 +50,22 @@ export function createMockAwareness(canvasId: string): CanvasAwareness {
 
 /**
  * Get awareness with caching - only fetches if stale or missing
+ *
+ * Uses the unified fetchAwareness function which prefers adapter over MCP.
  */
 export async function getAwarenessWithCaching(
   ctx: LoopContext,
   state: LoopState
 ): Promise<CanvasAwareness> {
   // Test mode: always use mock
-  if (ctx.config.skipMcpConnection) {
-    return createMockAwareness(ctx.canvasId);
+  if (ctx.config.skipMcpConnection && !ctx.adapter) {
+    return createMockAwareness(ctx.sessionId);
   }
 
   // Check if we need to refresh
   if (needsAwarenessRefresh(state.resources)) {
-    const freshAwareness = await fetchAwarenessFromMcp(
-      ctx.mcpClient,
-      ctx.canvasId,
+    const freshAwareness = await fetchAwareness(
+      ctx,
       ctx.resolvedTask,
       {
         tokenBudget: state.resources.context.tokenBudget,
@@ -89,6 +93,7 @@ export async function getAwarenessWithCaching(
 
 /**
  * Fetch awareness from canvas via MCP resource
+ * @deprecated Use fetchAwarenessFromAdapter instead
  */
 export async function fetchAwarenessFromMcp(
   mcp: McpClient,
@@ -104,7 +109,17 @@ export async function fetchAwarenessFromMcp(
 
     const uri = `resource://canvas/${canvasId}/snapshot${params.toString() ? "?" + params.toString() : ""}`;
 
-    const result = await mcp.readResource<CanvasSnapshotOutput>(uri);
+    // Use readResource if available, otherwise fall back to callTool
+    let result: CanvasSnapshotOutput;
+    if (mcp.readResource) {
+      result = await mcp.readResource<CanvasSnapshotOutput>(uri);
+    } else {
+      // Fall back to callTool
+      result = await mcp.callTool("canvas_snapshot", {
+        task,
+        tokenBudget: options.tokenBudget,
+      }) as CanvasSnapshotOutput;
+    }
 
     return {
       summary: result.summary ?? "Canvas state unavailable",
@@ -124,17 +139,100 @@ export async function fetchAwarenessFromMcp(
 }
 
 /**
+ * Fetch awareness from ActionAdapter
+ *
+ * This is the domain-agnostic way to get context awareness.
+ * Works with any adapter implementation (BTCP, MCP, etc.)
+ */
+export async function fetchAwarenessFromAdapter(
+  adapter: ActionAdapter,
+  task: string,
+  options: ContextOptions
+): Promise<CanvasAwareness> {
+  try {
+    const awarenessContext = await adapter.getAwareness({
+      includeSkeleton: true,
+      includeRelevant: true,
+      maxTokens: options.tokenBudget,
+      contextHint: task,
+    });
+
+    return {
+      summary: awarenessContext.summary,
+      skeleton: awarenessContext.skeleton as CanvasAwareness["skeleton"],
+      relevant: awarenessContext.relevant as CanvasAwareness["relevant"],
+      availableTools: awarenessContext.availableActions?.map((name) => ({
+        name,
+        description: adapter.getActionSchema(name)?.description || "",
+      })),
+      tokensUsed: awarenessContext.tokensUsed ?? 0,
+    };
+  } catch (error) {
+    // Fallback to minimal awareness
+    return {
+      summary: `State unavailable - use context_read to check current state. Error: ${error instanceof Error ? error.message : "Unknown"}`,
+      tokensUsed: 50,
+    };
+  }
+}
+
+/**
+ * Unified awareness fetcher - uses adapter if available, falls back to MCP
+ */
+export async function fetchAwareness(
+  ctx: LoopContext,
+  task: string,
+  options: ContextOptions
+): Promise<CanvasAwareness> {
+  // Prefer adapter if available
+  if (ctx.adapter) {
+    return fetchAwarenessFromAdapter(ctx.adapter, task, options);
+  }
+
+  // Fall back to MCP
+  return fetchAwarenessFromMcp(
+    ctx.mcpClient,
+    ctx.sessionId,
+    task,
+    options
+  );
+}
+
+/**
  * Fetch canvas snapshot for context injection
+ *
+ * Uses adapter if available, otherwise falls back to MCP client.
  */
 export async function fetchCanvasSnapshot(
   ctx: LoopContext,
   state: LoopState
 ): Promise<CanvasSnapshotOutput | null> {
   try {
-    const snapshotResult = await ctx.mcpClient.execute<CanvasSnapshotOutput>(
-      "canvas_snapshot",
-      { format: "level1" } // Quick summary, ~50 tokens
-    );
+    let snapshotResult: CanvasSnapshotOutput | null = null;
+
+    // Prefer adapter if available
+    if (ctx.adapter) {
+      const stateSnapshot = await ctx.adapter.getState({ format: "json" });
+      snapshotResult = {
+        summary: stateSnapshot.summary,
+        timestamp: stateSnapshot.timestamp,
+        data: stateSnapshot.data,
+        tokensUsed: stateSnapshot.tokensUsed,
+      };
+    } else if (ctx.mcpClient.execute) {
+      // Use execute if available
+      snapshotResult = await ctx.mcpClient.execute<CanvasSnapshotOutput>(
+        "canvas_snapshot",
+        { format: "level1" }
+      );
+    } else {
+      // Fall back to callTool
+      snapshotResult = await ctx.mcpClient.callTool(
+        "canvas_snapshot",
+        { format: "level1" }
+      ) as CanvasSnapshotOutput;
+    }
+
     if (snapshotResult && typeof snapshotResult === "object") {
       state.lastStateSnapshot = snapshotResult;
       return snapshotResult;
@@ -333,6 +431,6 @@ export function handleMutationToolEffect(
     }
   } else {
     // Read-only tools: just increment version without invalidation
-    state.resources.canvas.version++;
+    state.resources.browser.version++;
   }
 }

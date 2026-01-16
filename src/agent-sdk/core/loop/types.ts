@@ -4,6 +4,7 @@
  * Shared type definitions for the TOAD (Think, Act, Observe, Decide) loop.
  *
  * Updated to use browser/session terminology for BTCP integration.
+ * Now supports ActionAdapter for domain-agnostic operation.
  */
 
 import type { Content } from "@google/genai";
@@ -26,7 +27,10 @@ import type { AgentTool, ModelPreference, ModelProvider } from "../../types/inde
 import type { AgentToolName } from "../../tools/generic-definitions.js";
 import type { ToolSet } from "../../tools/ai-sdk-bridge.js";
 import type { LogReporter } from "../log-reporter.js";
-import type { BTCPAgentClient } from "../../btcp/client.js";
+import type { ActionAdapter } from "../../adapters/types.js";
+
+// Browser client is now accessed via ActionAdapter
+// BTCPAgentClient moved to browser-agent module
 
 // ============================================================================
 // BTCP/MCP CLIENT TYPES
@@ -34,11 +38,15 @@ import type { BTCPAgentClient } from "../../btcp/client.js";
 
 /**
  * MCP client interface for tool execution (legacy)
- * @deprecated Use BTCPAgentClient for browser tool execution
+ * @deprecated Use ActionAdapter for tool execution
  */
 export interface McpClient {
   callTool(name: string, args: Record<string, unknown>): Promise<unknown>;
   getTools?(): Promise<Array<{ name: string; description: string }>>;
+  /** Execute a tool (alias for callTool) */
+  execute?<T = unknown>(tool: string, args: Record<string, unknown>): Promise<T>;
+  /** Read a resource */
+  readResource?<T = unknown>(uri: string): Promise<T>;
 }
 
 /**
@@ -125,6 +133,31 @@ export interface StateSnapshotOutput {
  * Extends AgentConfig with additional test/integration options
  */
 export interface LoopOptions extends Partial<AgentConfig> {
+  // ===========================================================================
+  // ACTION ADAPTER (Primary - Domain-Agnostic)
+  // ===========================================================================
+
+  /**
+   * Action adapter for domain-specific operations.
+   * This is the primary way to connect the agent loop to external systems.
+   *
+   * When provided, the adapter is used for:
+   * - Connection lifecycle (connect/disconnect)
+   * - Tool execution (execute)
+   * - State/awareness fetching (getState/getAwareness)
+   *
+   * @example
+   * ```typescript
+   * const adapter = createBTCPAdapter({ serverUrl: 'http://localhost:8765' });
+   * const events = runAgenticLoop(task, sessionId, { adapter });
+   * ```
+   */
+  adapter?: ActionAdapter;
+
+  // ===========================================================================
+  // LEGACY OPTIONS (Backward Compatibility)
+  // ===========================================================================
+
   /** Custom MCP executor (for testing) */
   executor?: MCPExecutor;
   /** Pre-configured hooks manager (for testing) */
@@ -138,6 +171,7 @@ export interface LoopOptions extends Partial<AgentConfig> {
   /**
    * Custom MCP client for testing.
    * When provided, this client is used instead of creating an HttpMcpClient.
+   * @deprecated Use adapter option instead
    */
   mcpClient?: McpClient & {
     connect(): Promise<boolean>;
@@ -184,14 +218,32 @@ export interface LoopContext {
   readonly toolLifecycle: ToolResultLifecycle;
   readonly echoPrevention: EchoPoisoningPrevention;
 
-  // Browser client (BTCP) - primary tool execution
-  readonly browserClient?: BTCPAgentClient;
+  // ===========================================================================
+  // ACTION ADAPTER (Primary - Domain-Agnostic)
+  // ===========================================================================
 
-  // MCP client (legacy, for backward compatibility)
+  /**
+   * Action adapter for domain-specific operations.
+   * When provided, this is used instead of mcpClient/browserClient.
+   */
+  readonly adapter?: ActionAdapter;
+
+  // ===========================================================================
+  // LEGACY CLIENTS (Backward Compatibility)
+  // ===========================================================================
+
+  /** Browser client (BTCP) - primary tool execution */
+  readonly browserClient?: BrowserClient;
+
+  /**
+   * MCP client (legacy, for backward compatibility)
+   * @deprecated Use adapter instead
+   */
   readonly mcpClient: McpClient & {
     connect(): Promise<boolean>;
     disconnect(): void;
   };
+
   readonly tools: ToolSet;
 
   // LLM
@@ -300,7 +352,8 @@ export type {
   ModelProvider,
   BrowserAwareness,
   LogReporter,
-  BTCPAgentClient,
+  BrowserClient,
+  ActionAdapter,
 };
 
 // Legacy type aliases (for backward compatibility)

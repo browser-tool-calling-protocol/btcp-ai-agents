@@ -66,17 +66,17 @@ export {
   type GenericToolResult,
   type GenericToolContext,
   type GenericToolDefinition,
-} from './tools/generic-definitions.js';
+} from './agent-sdk/tools/generic-definitions.js';
 
 // Tool implementations
-export { executeContextRead } from './tools/context-read.js';
-export { executeContextWrite } from './tools/context-write.js';
-export { executeContextSearch } from './tools/context-search.js';
-export { executeTaskExecute } from './tools/task-execute.js';
-export { executeStateSnapshot, getSnapshot, listSnapshots, deleteSnapshot } from './tools/state-snapshot.js';
-export { executeAgentDelegate, setAgentExecutor, getDelegation, listDelegations, clearCompletedDelegations } from './tools/agent-delegate.js';
-export { executeAgentPlan, getPlan, getNextSteps, updateStepStatus, deletePlan } from './tools/agent-plan.js';
-export { executeAgentClarify, getClarification, answerClarification, skipClarification, listPendingClarifications, clearOldClarifications, formatClarification } from './tools/agent-clarify.js';
+export { executeContextRead } from './agent-sdk/tools/context-read.js';
+export { executeContextWrite } from './agent-sdk/tools/context-write.js';
+export { executeContextSearch } from './agent-sdk/tools/context-search.js';
+export { executeTaskExecute } from './agent-sdk/tools/task-execute.js';
+export { executeStateSnapshot, getSnapshot, listSnapshots, deleteSnapshot } from './agent-sdk/tools/state-snapshot.js';
+export { executeAgentDelegate, setAgentExecutor, getDelegation, listDelegations, clearCompletedDelegations } from './agent-sdk/tools/agent-delegate.js';
+export { executeAgentPlan, getPlan, getNextSteps, updateStepStatus, deletePlan } from './agent-sdk/tools/agent-plan.js';
+export { executeAgentClarify, getClarification, answerClarification, skipClarification, listPendingClarifications, clearOldClarifications, formatClarification } from './agent-sdk/tools/agent-clarify.js';
 
 // ============================================================================
 // GENERIC AGENTS
@@ -97,7 +97,7 @@ export {
   type GenericAgentDefinition,
   type GenericAgentCapabilities,
   type ModelTier,
-} from './agents/generic-definitions.js';
+} from './agent-sdk/agents/generic-definitions.js';
 
 // ============================================================================
 // SKILL REGISTRY
@@ -111,7 +111,7 @@ export {
   type SkillRegistry,
   type SkillInjectionConfig,
   type SkillInjectionResult,
-} from './skills/registry.js';
+} from './agent-sdk/skills/registry.js';
 
 // ============================================================================
 // ACTION ADAPTERS
@@ -123,7 +123,7 @@ export {
   setAdapterRegistry,
   type ActionAdapter,
   type ActionAdapterRegistry,
-} from './adapters/types.js';
+} from './agent-sdk/adapters/types.js';
 
 // ============================================================================
 // CORE SDK (Browser-Safe Parts)

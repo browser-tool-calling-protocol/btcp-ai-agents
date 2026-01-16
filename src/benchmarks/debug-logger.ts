@@ -22,7 +22,7 @@ import type {
   LogEntry,
   LogLevel,
   LogEntryType,
-} from "../core/log-reporter.js";
+} from "../agent-sdk/core/log-reporter.js";
 
 // ============================================================================
 // CONSTANTS

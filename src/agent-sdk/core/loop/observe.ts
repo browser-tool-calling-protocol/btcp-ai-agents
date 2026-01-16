@@ -143,7 +143,7 @@ export async function saveCheckpointIfDue(
       type: "checkpoint",
       timestamp: Date.now(),
       sessionId: ctx.sessionId,
-      canvasVersion: state.resources.canvas.version,
+      stateVersion: state.resources.browser.version,
       operationCount: state.history.length,
     };
   }
