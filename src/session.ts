@@ -39,16 +39,13 @@
 
 import type {
   AgentEvent,
-  AgentConfig,
   CancellationToken,
-  PlanTask,
 } from "./agents/types.js";
 import type { ActionAdapter, AwarenessContext } from "./adapters/types.js";
 import type { ContextManager } from "./context/manager.js";
 import type { HooksManager } from "./hooks/manager.js";
 import type { ResourceRegistry } from "./resources/registry.js";
 import type { SessionSerializer } from "./context/serialization.js";
-import type { LLMProvider } from "./core/providers/index.js";
 
 import { runAgenticLoop, type LoopOptions } from "./core/loop/index.js";
 import { createContextManager } from "./context/manager.js";
@@ -56,9 +53,7 @@ import { createHooksManager, CommonHooks } from "./hooks/manager.js";
 import { createResourceRegistry } from "./resources/registry.js";
 import { registerBuiltInProviders } from "./resources/providers.js";
 import { generateSessionId } from "./context/serialization.js";
-import { createProvider } from "./core/providers/index.js";
-import { getModelId } from "./core/client.js";
-import { MODEL_DEFAULTS, LOOP_DEFAULTS } from "./core/constants.js";
+import { LOOP_DEFAULTS } from "./core/constants.js";
 
 // =============================================================================
 // TYPES
@@ -202,7 +197,6 @@ export class AgentSession {
   private readonly contextManager: ContextManager;
   private readonly hooksManager: HooksManager;
   private readonly resourceRegistry: ResourceRegistry;
-  private readonly llmProvider: LLMProvider;
 
   // Statistics
   private stats: SessionStats = {
@@ -234,10 +228,6 @@ export class AgentSession {
     if (!config.resources) {
       registerBuiltInProviders(this.resourceRegistry);
     }
-
-    // Initialize LLM provider
-    const providerName = config.provider ?? MODEL_DEFAULTS.provider;
-    this.llmProvider = createProvider(providerName);
   }
 
   // ===========================================================================
@@ -570,21 +560,15 @@ export async function createAgentSession(
  * Create a cancellation token
  */
 export function createCancellationToken(): CancellationToken {
-  let cancelled = false;
-  const listeners: Array<() => void> = [];
-
-  return {
-    get isCancelled() {
-      return cancelled;
-    },
-    cancel() {
-      cancelled = true;
-      listeners.forEach((fn) => fn());
-    },
-    onCancel(fn: () => void) {
-      listeners.push(fn);
+  const token: CancellationToken = {
+    cancelled: false,
+    reason: undefined,
+    cancel(reason = "User cancelled") {
+      token.cancelled = true;
+      token.reason = reason;
     },
   };
+  return token;
 }
 
 // =============================================================================

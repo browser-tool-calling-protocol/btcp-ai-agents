@@ -135,7 +135,17 @@ export type {
   CancellationToken,
   PlanTask,
   AgentMode,
-  BrowserAwareness,
+  // Core event types
+  IterationEvent,
+  ThinkingEvent,
+  ToolCallEvent,
+  ToolResultEvent,
+  ObservationEvent,
+  DecisionEvent,
+  ContextEvent,
+  ErrorEvent,
+  CompleteEvent,
+  CancelledEvent,
 } from './agents/types.js';
 
 export type {
@@ -181,7 +191,7 @@ export {
 export {
   createProvider,
   type LLMProvider,
-  type LLMProviderConfig,
+  type ProviderConfig,
 } from './core/providers/index.js';
 
 // =============================================================================
@@ -196,7 +206,7 @@ export {
 export {
   MemoryTier,
   MessagePriority,
-  type Message,
+  type ContextMessage,
   type ContextStats,
 } from './context/types.js';
 
@@ -206,7 +216,7 @@ export {
 
 export {
   ToolResultLifecycle,
-  type ToolResultState,
+  type ToolResultStage,
 } from './context/tool-lifecycle.js';
 
 export {
@@ -225,10 +235,15 @@ export {
 export {
   createHooksManager,
   CommonHooks,
-  type HooksManager,
-  type PreExecuteHook,
-  type PostExecuteHook,
+  HooksManager,
 } from './hooks/manager.js';
+
+export type {
+  HookType,
+  HookContext,
+  HookHandler,
+  HookResult,
+} from './hooks/types.js';
 
 // =============================================================================
 // RESOURCES
@@ -236,10 +251,14 @@ export {
 
 export {
   createResourceRegistry,
-  type ResourceRegistry,
-  type ResourceProvider,
-  type AliasMatch,
+  ResourceRegistry,
 } from './resources/registry.js';
+
+export type {
+  ResourceProvider,
+  ResourceDefinition,
+  ResolvedResource,
+} from './resources/types.js';
 
 export {
   registerBuiltInProviders,

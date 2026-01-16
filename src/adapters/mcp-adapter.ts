@@ -61,7 +61,6 @@ export class MCPAdapter implements ActionAdapter {
   readonly type = 'mcp';
 
   private client: HttpMcpClient;
-  private config: MCPAdapterConfig;
   private connectionState: AdapterConnectionState = 'disconnected';
 
   // Known MCP tools (canvas-mcp specific)
@@ -134,7 +133,6 @@ export class MCPAdapter implements ActionAdapter {
   ];
 
   constructor(config: MCPAdapterConfig) {
-    this.config = config;
     this.id = `mcp-${config.canvasId}`;
 
     // Use provided client or create new one
@@ -192,7 +190,7 @@ export class MCPAdapter implements ActionAdapter {
   async execute<T = unknown>(
     action: string,
     params: Record<string, unknown>,
-    options?: ExecuteOptions
+    _options?: ExecuteOptions
   ): Promise<ActionResult<T>> {
     const startTime = Date.now();
 

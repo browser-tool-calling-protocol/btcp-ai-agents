@@ -86,13 +86,11 @@ export class BTCPAdapter implements ActionAdapter {
   readonly type = 'btcp';
 
   private client: BTCPAgentClient;
-  private config: BTCPAdapterConfig;
   private stateCache: StateSnapshot | null = null;
   private stateCacheTime = 0;
   private readonly stateCacheTTL = 1000; // 1 second
 
   constructor(config: BTCPAdapterConfig = {}) {
-    this.config = config;
     this.id = `btcp-${config.sessionId || 'default'}`;
 
     // Use provided client or create new one

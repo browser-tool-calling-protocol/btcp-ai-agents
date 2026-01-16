@@ -602,9 +602,9 @@ export function buildCanvasAgentContext(
   }));
 
   // Canvas state
-  const canvasSummary = resources.canvas.summary
-    ? formatCanvasSummary(resources.canvas.summary)
-    : `Canvas ID: ${resources.canvas.id}, Version: ${resources.canvas.version}`;
+  const canvasSummary = resources.browser.summary
+    ? formatCanvasSummary(resources.browser.summary)
+    : `Canvas ID: ${resources.browser.id}, Version: ${resources.browser.version}`;
 
   manager.addChunk(createChunk("canvas_state", canvasSummary, {
     id: "canvas",
@@ -612,10 +612,10 @@ export function buildCanvasAgentContext(
   }));
 
   // Working set (selection/viewport)
-  if (resources.canvas.workingSet?.length) {
+  if (resources.browser.workingSet?.length) {
     manager.addChunk(createChunk(
       "working_set",
-      formatWorkingSet(resources.canvas.workingSet),
+      formatWorkingSet(resources.browser.workingSet),
       { id: "working", priority: 75 }
     ));
   }

@@ -81,15 +81,19 @@ export {
   type ToolHandler,
 } from './btcp/client.js';
 
-export type {
-  BTCPClientConfig,
-  BTCPToolDefinition,
-  BTCPToolResult,
-  BTCPToolContent,
-  BTCPRequest,
-  BTCPResponse,
+export {
   BTCPError,
-  BTCPSession,
+  BTCPErrorCodes,
+  generateRequestId,
+  generateSessionId,
+  type BTCPClientConfig,
+  type BTCPToolDefinition,
+  type BTCPToolResult,
+  type BTCPToolResultContent,
+  type BTCPConnectionState,
+  type BTCPSession,
+  type BrowserToolInput,
+  type BrowserToolResult,
 } from './btcp/types.js';
 
 // =============================================================================
@@ -110,7 +114,9 @@ export {
 
 export {
   createBrowserTool,
-  wrapBTCPAsGenericTool,
+  createBrowserToolSet,
+  formatBrowserToolsForPrompt,
+  type BrowserToolOptions,
 } from './btcp/browser-tool.js';
 
 // =============================================================================
@@ -118,17 +124,33 @@ export {
 // =============================================================================
 
 export {
-  createAgentHttpHandler,
-  type AgentHttpRequest,
-  type AgentHttpResponse,
+  handleChat,
+  handleChatSync,
+  handleCommand,
+  handleCommandSync,
+  handleHealth,
+  createChatRouter,
+  type ChatRequest,
+  type CommandRequest,
 } from './http/handler.js';
 
 // =============================================================================
 // RE-EXPORT CORE SDK
 // =============================================================================
 
-// Re-export essential types from agent-sdk for convenience
+// Re-export session API from agent-sdk (primary interface)
 export {
+  // Session API (Primary)
+  AgentSession,
+  createAgentSession,
+  createCancellationToken,
+  runTask,
+  streamTask,
+  type AgentSessionConfig,
+  type TaskResult,
+  type SessionState,
+  type SessionStats,
+  // Low-level loop (deprecated)
   runAgenticLoop,
   type AgentEvent,
   type AgentConfig,
