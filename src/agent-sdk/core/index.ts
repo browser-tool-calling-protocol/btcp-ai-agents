@@ -1,7 +1,7 @@
 /**
- * @waiboard/ai-agents SDK
+ * @btcp/ai-agents SDK
  *
- * Claude Agent SDK-compatible API for canvas manipulation.
+ * Claude Agent SDK-compatible API for domain-agnostic agent operations.
  * This module provides a modern, type-safe interface aligned with
  * the official Claude Agent SDK patterns.
  *
@@ -11,9 +11,9 @@
  *
  * ### Query API (V1 Pattern)
  * ```typescript
- * import { query } from '@waiboard/ai-agents/sdk';
+ * import { query } from '@btcp/ai-agents/sdk';
  *
- * const messages = query('Create a flowchart', { canvasId: 'my-canvas' });
+ * const messages = query('Analyze the data', { sessionId: 'my-session' });
  *
  * for await (const message of messages) {
  *   if (message.type === 'result') {
@@ -24,9 +24,9 @@
  *
  * ### Session API (V2 Pattern)
  * ```typescript
- * import { createSession } from '@waiboard/ai-agents/sdk';
+ * import { createSession } from '@btcp/ai-agents/sdk';
  *
- * const session = await createSession({ canvasId: 'my-canvas' });
+ * const session = await createSession({ sessionId: 'my-session' });
  *
  * await session.send('Create a flowchart');
  * for await (const msg of session.stream()) {
@@ -43,7 +43,7 @@
  *
  * ### Type-Safe Tools
  * ```typescript
- * import { tool } from '@waiboard/ai-agents/sdk';
+ * import { tool } from '@btcp/ai-agents/sdk';
  * import { z } from 'zod';
  *
  * const myTool = tool({
@@ -54,7 +54,7 @@
  * });
  * ```
  *
- * @module @waiboard/ai-agents/sdk
+ * @module @btcp/ai-agents/sdk
  */
 
 // ============================================================================
@@ -409,7 +409,9 @@ export {
   // Re-exports for advanced use
   runAgenticLoop,
   initializeResources,
+  runAgent,
   runCanvasAgent,
+  getAgentResult,
   getCanvasAgentResult,
   type LoopOptions,
   type MCPExecutor,
@@ -483,12 +485,15 @@ export {
 
 export {
   // Streaming consumption
+  streamAgent,
   streamCanvasAgent,
   // Batch consumption
   runCanvasAgent as runCanvasAgentBatch,
   getCanvasAgentResult as getCanvasAgentResultBatch,
   // Session-based
+  AgentChatSession,
   CanvasAgentSession,
+  createAgentChatSession,
   createCanvasAgentSession,
   // HTTP handler
   handleCanvasAgentStream as handleCanvasAgentStreamConsumption,

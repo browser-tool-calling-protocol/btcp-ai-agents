@@ -1,12 +1,12 @@
-# @waiboard/ai-agents
+# @btcp/ai-agents
 
-AI agent engine for canvas operations using the **TOAD pattern** (Think, Act, Observe, Decide).
+General-purpose AI agent framework using the **TOAD pattern** (Think, Act, Observe, Decide) with pluggable adapters for any domain.
 
 ## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           @waiboard/ai-agents                               │
+│                            @btcp/ai-agents                                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
@@ -22,8 +22,8 @@ AI agent engine for canvas operations using the **TOAD pattern** (Think, Act, Ob
 │  ┌──────────────┐         ┌──────────────┐         ┌──────────────┐        │
 │  │   RESOURCES  │         │     CORE     │         │    TOOLS     │        │
 │  │              │         │              │         │              │        │
-│  │ • Aliases    │         │ • TOAD Loop  │         │ • canvas_*   │        │
-│  │ • Registry   │         │ • LLM        │         │ • 5-tool API │        │
+│  │ • Aliases    │         │ • TOAD Loop  │         │ • Generic    │        │
+│  │ • Registry   │         │ • LLM        │         │ • 8-tool API │        │
 │  │ • Providers  │         │ • Providers  │         │ • Delegation │        │
 │  └──────────────┘         └──────────────┘         └──────────────┘        │
 │          │                         │                         │             │
@@ -33,7 +33,7 @@ AI agent engine for canvas operations using the **TOAD pattern** (Think, Act, Ob
 │  │                         INFRASTRUCTURE                               │   │
 │  │                                                                      │   │
 │  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐   │   │
-│  │  │ Context │  │  Hooks  │  │ Skills  │  │  HTTP   │  │   MCP   │   │   │
+│  │  │ Context │  │  Hooks  │  │ Skills  │  │  HTTP   │  │  BTCP   │   │   │
 │  │  │ Manager │  │ Manager │  │ Inject  │  │ Handler │  │ Client  │   │   │
 │  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘   │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
@@ -50,7 +50,7 @@ The core loop follows the **TOAD pattern** - a structured approach to agentic ex
 │                        TOAD LOOP - MESSAGE ROUND TRIP                       │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  User Message: "Create a flowchart with 3 steps"                            │
+│  User Message: "Click the login button and fill in the form"                │
 │                              │                                              │
 │                              ▼                                              │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
@@ -58,8 +58,8 @@ The core loop follows the **TOAD pattern** - a structured approach to agentic ex
 │  │ ║                         T H I N K                                 ║ │  │
 │  │ ╠══════════════════════════════════════════════════════════════════╣ │  │
 │  │ ║                                                                  ║ │  │
-│  │ ║  • Fetch canvas snapshot (current state)                         ║ │  │
-│  │ ║  • Build canvas awareness (what exists, available space)         ║ │  │
+│  │ ║  • Fetch state snapshot (current context)                        ║ │  │
+│  │ ║  • Build awareness (what exists, available actions)              ║ │  │
 │  │ ║  • Inject context (skills, task state, corrections)              ║ │  │
 │  │ ║  • Age tool results (3-stage lifecycle)                          ║ │  │
 │  │ ║  • Format user message with awareness                            ║ │  │
@@ -77,7 +77,7 @@ The core loop follows the **TOAD pattern** - a structured approach to agentic ex
 │  │              ▼                               ▼                       │  │
 │  │     ┌─────────────────┐             ┌─────────────────┐              │  │
 │  │     │  Text Response  │             │   Tool Calls    │              │  │
-│  │     │  (no tools)     │             │  (canvas_*)     │              │  │
+│  │     │  (no tools)     │             │  (generic)      │              │  │
 │  │     └────────┬────────┘             └────────┬────────┘              │  │
 │  │              │                               │                       │  │
 │  │              ▼                               ▼                       │  │
@@ -87,7 +87,7 @@ The core loop follows the **TOAD pattern** - a structured approach to agentic ex
 │  │ ║                        ║    ║                                  ║  │  │
 │  │ ║  • type: "complete"    ║    ║  For each tool call:             ║  │  │
 │  │ ║  • Return summary      ║    ║  • Validate via hooks (pre)      ║  │  │
-│  │ ║  • End loop            ║    ║  • Execute via MCP client        ║  │  │
+│  │ ║  • End loop            ║    ║  • Execute via adapter            ║  │  │
 │  │ ║                        ║    ║  • Emit events (post)            ║  │  │
 │  │ ╚════════════════════════╝    ║  • Check for interruption        ║  │  │
 │  │              │                ║                                  ║  │  │
@@ -133,63 +133,19 @@ The core loop follows the **TOAD pattern** - a structured approach to agentic ex
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Decision Tree
-
-```
-                           ┌─────────────────┐
-                           │  User Message   │
-                           └────────┬────────┘
-                                    │
-                                    ▼
-                           ┌─────────────────┐
-                           │     THINK       │
-                           │  Gather context │
-                           └────────┬────────┘
-                                    │
-                                    ▼
-                           ┌─────────────────┐
-                           │  LLM Generate   │
-                           └────────┬────────┘
-                                    │
-                    ┌───────────────┴───────────────┐
-                    ▼                               ▼
-           ┌───────────────┐               ┌───────────────┐
-           │ Tool calls?   │               │ Text only?    │
-           │     YES       │               │     YES       │
-           └───────┬───────┘               └───────┬───────┘
-                   │                               │
-                   ▼                               ▼
-           ┌───────────────┐               ┌───────────────┐
-           │     ACT       │               │    DECIDE     │
-           │ Execute tools │               │  "complete"   │
-           └───────┬───────┘               └───────┬───────┘
-                   │                               │
-                   ▼                               ▼
-           ┌───────────────┐               ┌───────────────┐
-           │   OBSERVE     │               │     DONE      │
-           │ Process result│               │ Return result │
-           └───────┬───────┘               └───────────────┘
-                   │
-                   ▼
-           ┌───────────────┐
-           │    DECIDE     │
-           └───────┬───────┘
-                   │
-       ┌───────────┴───────────┐
-       ▼                       ▼
-┌─────────────┐         ┌─────────────┐
-│  continue   │         │  terminal   │
-│ → THINK     │         │ → DONE      │
-└─────────────┘         └─────────────┘
-```
-
 ## Quick Start
 
 ```typescript
-import { streamCanvasAgent, getCanvasAgentResult } from '@waiboard/ai-agents';
+import { createAgentSession, createBTCPAdapter } from '@btcp/ai-agents';
+
+// Create session with adapter
+const session = await createAgentSession({
+  adapter: createBTCPAdapter({ serverUrl: 'http://localhost:8765' }),
+  model: 'balanced',
+});
 
 // Streaming (recommended for UIs)
-for await (const event of streamCanvasAgent('Create a flowchart', { canvasId: 'canvas-1' })) {
+for await (const event of session.run('Analyze the page and click login')) {
   switch (event.type) {
     case 'thinking': console.log('Thinking:', event.message); break;
     case 'tool_call': console.log('Tool:', event.tool); break;
@@ -198,34 +154,37 @@ for await (const event of streamCanvasAgent('Create a flowchart', { canvasId: 'c
 }
 
 // Simple (result only)
-const result = await getCanvasAgentResult('Add a rectangle', { canvasId: 'canvas-1' });
-console.log(result.success ? result.summary : result.error);
+const result = await session.execute('Fill in the registration form');
+console.log(result.success ? result.summary : result.errors);
+
+// Cleanup
+await session.close();
 ```
 
 ## Package Structure
 
 ```
 src/
-├── core/                    # Core TOAD loop implementation
-│   ├── loop/               # TOAD phases
-│   │   ├── types.ts        # Shared type definitions
-│   │   ├── context.ts      # Context & awareness management
-│   │   ├── think.ts        # THINK phase
-│   │   ├── act.ts          # ACT phase
-│   │   ├── observe.ts      # OBSERVE phase
-│   │   ├── decide.ts       # DECIDE phase
-│   │   └── index.ts        # Main orchestrator
-│   ├── providers/          # LLM providers (Gemini, OpenAI)
-│   └── execution.ts        # Consumption patterns
+├── agent-sdk/               # Core domain-agnostic framework
+│   ├── session.ts           # Session-based API (primary interface)
+│   ├── core/                # TOAD loop implementation
+│   │   ├── loop/            # TOAD phases (think, act, observe, decide)
+│   │   └── providers/       # LLM providers (Gemini, OpenAI)
+│   ├── agents/              # Agent definitions & prompts
+│   ├── tools/               # Generic 8-tool API
+│   ├── context/             # Context & memory management (6-tier)
+│   ├── resources/           # @alias resolution
+│   ├── skills/              # Auto-injecting skills
+│   └── hooks/               # Pre/post execution hooks
 │
-├── agents/                  # Agent definitions & prompts
-├── tools/                   # 5-tool canvas API
-├── context/                 # Context & memory management
-├── resources/               # Alias resolution (@selection, @color)
-├── skills/                  # Auto-injecting skills
-├── hooks/                   # Pre/post execution hooks
-├── http/                    # HTTP handlers
-└── planning/                # Orchestration & delegation
+├── browser-agent/           # Browser-specific integration (BTCP)
+│   ├── btcp/                # Browser Tool Calling Protocol client
+│   ├── adapters/            # BTCP & MCP adapters
+│   └── http/                # HTTP handlers
+│
+├── planning/                # Orchestration & delegation
+├── tracing/                 # OpenTelemetry-compatible tracing
+└── benchmarks/              # Performance benchmarking
 ```
 
 ## Key Concepts
@@ -235,59 +194,85 @@ src/
 | Phase | Responsibility |
 |-------|---------------|
 | **THINK** | Gather context, build awareness, prepare user message |
-| **ACT** | Execute tool calls via MCP, handle blocking/interruption |
+| **ACT** | Execute tool calls via adapter, handle blocking/interruption |
 | **OBSERVE** | Process results, update state, validate for echo poisoning |
 | **DECIDE** | Determine continuation: continue, complete, fail, timeout |
 
-### 5-Tool Canvas API
+### 8-Tool Generic API
 
 | Tool | Purpose |
 |------|---------|
-| `canvas_read` | Get canvas state as JSON/ASCII/XML |
-| `canvas_write` | Create new elements |
-| `canvas_edit` | Modify existing elements |
-| `canvas_find` | Search by pattern |
-| `canvas_capture` | Export to image |
+| `context_read` | Read from agent context, memory, or history |
+| `context_write` | Write to agent context or memory |
+| `context_search` | Search through context and history |
+| `task_execute` | Execute actions through the adapter |
+| `state_snapshot` | Capture state checkpoint for rollback |
+| `agent_delegate` | Delegate to specialized sub-agent |
+| `agent_plan` | Create/update execution plans |
+| `agent_clarify` | Request user clarification |
+
+### ActionAdapter Interface
+
+The adapter pattern enables domain-agnostic operation. Implement `ActionAdapter` to connect to any backend:
+
+```typescript
+interface ActionAdapter {
+  execute<T>(action: string, params: Record<string, unknown>): Promise<ActionResult<T>>;
+  getAvailableActions(): ActionDefinition[];
+  getState(): Promise<StateSnapshot>;
+  getAwareness(): Promise<AwarenessContext>;
+  connect(): Promise<boolean>;
+  disconnect(): void;
+}
+```
+
+Built-in adapters:
+- **BTCPAdapter** - Browser Tool Calling Protocol (primary)
+- **MCPAdapter** - Model Context Protocol (legacy)
+- **NoOpAdapter** - Testing/development
 
 ### Subagent Delegation
 
-Domain specialists for creative outputs:
-- **moodboard** - Visual inspiration boards
-- **mindmap** - Hierarchical idea maps
-- **diagram** - Flowcharts, ERDs, process diagrams
-- **wireframe** - UI mockups
-- **timeline** - Chronological events
+Generic specialist agents for task decomposition:
+- **planner** - Break down complex tasks into steps
+- **executor** - Carry out planned steps efficiently
+- **analyzer** - Examine data and identify patterns
+- **explorer** - Discover context and map structure
 
 ## Package Exports
 
 ```typescript
-import { ... } from '@waiboard/ai-agents';           // Main entry
-import { ... } from '@waiboard/ai-agents/core';      // TOAD loop
-import { ... } from '@waiboard/ai-agents/tools';     // Canvas tools
-import { ... } from '@waiboard/ai-agents/context';   // Context management
-import { ... } from '@waiboard/ai-agents/resources'; // Alias resolution
-import { ... } from '@waiboard/ai-agents/skills';    // Skill injection
-import { ... } from '@waiboard/ai-agents/hooks';     // Execution hooks
-import { ... } from '@waiboard/ai-agents/http';      // HTTP handlers
-import { ... } from '@waiboard/ai-agents/types';     // TypeScript types
+import { ... } from '@btcp/ai-agents';              // Main entry
+import { ... } from '@btcp/ai-agents/agent-sdk';     // Core SDK
+import { ... } from '@btcp/ai-agents/browser-agent';  // Browser integration
+import { ... } from '@btcp/ai-agents/core';           // TOAD loop
+import { ... } from '@btcp/ai-agents/tools';          // Generic tools
+import { ... } from '@btcp/ai-agents/context';        // Context management
+import { ... } from '@btcp/ai-agents/resources';      // @alias resolution
+import { ... } from '@btcp/ai-agents/skills';         // Skill injection
+import { ... } from '@btcp/ai-agents/hooks';          // Execution hooks
+import { ... } from '@btcp/ai-agents/types';          // TypeScript types
 ```
 
 ## Environment Variables
 
 ```bash
-GOOGLE_API_KEY=...      # Gemini (required for image generation)
+GOOGLE_API_KEY=...      # Gemini (primary)
 OPENAI_API_KEY=...      # OpenAI (optional)
 ANTHROPIC_API_KEY=...   # Anthropic (optional)
+BTCP_SERVER_URL=...     # BTCP server for remote browser tools (optional)
 ```
 
 ## Development
 
 ```bash
 pnpm dev              # Start dev server (port 4111)
-pnpm test             # Run tests
+pnpm test             # Run unit tests
+pnpm test:all         # Run all tests
 pnpm build            # Build package
+pnpm benchmark        # Run benchmarks
 ```
 
 ## License
 
-Private - Waiboard
+MIT

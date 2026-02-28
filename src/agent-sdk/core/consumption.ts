@@ -28,7 +28,7 @@
  *
  * @see docs/engineering/CLAUDE_CODE_PATTERNS.md#pattern-2
  *
- * @module @waiboard/ai-agents/core
+ * @module @btcp/ai-agents/core
  */
 
 import { runAgenticLoop } from "./loop.js";
@@ -79,7 +79,7 @@ function buildLoopConfig(config: AgentConfig) {
  *   signal: controller.signal,
  * };
  *
- * for await (const event of streamCanvasAgent(task, config)) {
+ * for await (const event of streamAgent(task, config)) {
  *   if (event.type === "thinking") {
  *     showSpinner(event.message);
  *   } else if (event.type === "complete") {
@@ -91,13 +91,16 @@ function buildLoopConfig(config: AgentConfig) {
  * controller.abort("User cancelled");
  * ```
  */
-export async function* streamCanvasAgent(
+export async function* streamAgent(
   task: string,
   config: AgentConfig
 ): AsyncGenerator<AgentEvent> {
-  const canvasId = config.canvasId || "default";
-  yield* runAgenticLoop(task, canvasId, buildLoopConfig(config));
+  const sessionId = config.sessionId || config.canvasId || "default";
+  yield* runAgenticLoop(task, sessionId, buildLoopConfig(config));
 }
+
+/** @deprecated Use streamAgent instead */
+export const streamCanvasAgent = streamAgent;
 
 /**
  * Batch consumption - collect all events
@@ -210,16 +213,16 @@ export async function getCanvasAgentResult(
  *
  * @example
  * ```typescript
- * const session = createCanvasAgentSession({ canvasId: "my-canvas" });
+ * const session = createAgentChatSession({ sessionId: "my-session" });
  *
- * await session.chat("Create a rectangle");
- * await session.chat("Make it blue");
- * await session.chat("Move it to the right");
+ * await session.chat("Analyze the page");
+ * await session.chat("Click the login button");
+ * await session.chat("Fill in the form");
  *
  * console.log(session.getHistory());
  * ```
  */
-export class CanvasAgentSession {
+export class AgentChatSession {
   private config: AgentConfig;
   private history: AgentEvent[] = [];
   private cancellation: CancellationToken;
@@ -235,11 +238,11 @@ export class CanvasAgentSession {
   async *chat(task: string): AsyncGenerator<AgentEvent> {
     // Reset cancellation token for new chat
     this.cancellation = createCancellationToken();
-    const canvasId = this.config.canvasId || "default";
+    const sessionId = this.config.sessionId || this.config.canvasId || "default";
 
     for await (const event of runAgenticLoop(
       task,
-      canvasId,
+      sessionId,
       buildLoopConfig(this.config)
     )) {
       this.history.push(event);
@@ -302,13 +305,19 @@ export class CanvasAgentSession {
 }
 
 /**
- * Create a canvas agent session
+ * Create an agent chat session
  */
-export function createCanvasAgentSession(
+export function createAgentChatSession(
   config: AgentConfig
-): CanvasAgentSession {
-  return new CanvasAgentSession(config);
+): AgentChatSession {
+  return new AgentChatSession(config);
 }
+
+/** @deprecated Use AgentChatSession instead */
+export const CanvasAgentSession = AgentChatSession;
+
+/** @deprecated Use createAgentChatSession instead */
+export const createCanvasAgentSession = createAgentChatSession;
 
 /**
  * Express-compatible handler for streaming responses

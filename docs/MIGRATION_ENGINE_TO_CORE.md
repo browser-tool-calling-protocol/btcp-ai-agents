@@ -139,16 +139,16 @@ This document outlines the migration of implementation code from `engine/` to `c
 
 ```typescript
 // Query API (V1)
-import { query, prompt, runQuery, streamQuery } from '@waiboard/ai-agents/core';
+import { query, prompt, runQuery, streamQuery } from '@btcp/ai-agents/core';
 
 // Session API (V2)
-import { createSession, resumeSession } from '@waiboard/ai-agents/core';
+import { createSession, resumeSession } from '@btcp/ai-agents/core';
 
 // Execution (internal, but exported for advanced use)
-import { execute, ExecuteOptions } from '@waiboard/ai-agents/core';
+import { execute, ExecuteOptions } from '@btcp/ai-agents/core';
 
 // Delegation
-import { delegate, delegateAll, detectAgent } from '@waiboard/ai-agents/core';
+import { delegate, delegateAll, detectAgent } from '@btcp/ai-agents/core';
 ```
 
 ### Legacy API (engine/) - Deprecated
@@ -157,10 +157,10 @@ import { delegate, delegateAll, detectAgent } from '@waiboard/ai-agents/core';
 // Still works, but shows deprecation warning
 import {
   runAgenticLoop,      // → use execute() from core
-  streamCanvasAgent,      // → use query() from core
-  runCanvasAgent,         // → use runQuery() from core
+  streamAgent,            // → use query() from core
+  runAgent,               // → use runQuery() from core
   delegateToSubAgent,     // → use delegate() from core
-} from '@waiboard/ai-agents/engine';
+} from '@btcp/ai-agents/engine';
 ```
 
 ## Implementation Notes
@@ -173,7 +173,7 @@ The `runAgenticLoop` function (~1700 lines) needs to be refactored into smaller,
 // core/execution.ts
 
 export interface ExecuteOptions {
-  canvasId: string;
+  sessionId: string;
   model?: ModelId;
   tools?: ToolsOption;
   hooks?: HookConfig[];
@@ -209,7 +209,7 @@ export interface DelegateOptions {
   agent: AgentType;
   task: string;
   skill?: DomainSkill;
-  canvasId?: string;
+  sessionId?: string;
   context?: string;
 }
 

@@ -4,7 +4,7 @@
  * Abstract interface for LLM providers (Google Gemini, OpenAI).
  * Enables dual-provider support with a single abstraction layer.
  *
- * @module @waiboard/ai-agents/core/providers
+ * @module @btcp/ai-agents/core/providers
  */
 
 import type { z } from "zod";

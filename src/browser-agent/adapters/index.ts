@@ -6,7 +6,7 @@
  *
  * Available adapters:
  * - BTCPAdapter: For Browser Tool Calling Protocol (browser tools)
- * - MCPAdapter: For Model Context Protocol (legacy canvas-mcp)
+ * - MCPAdapter: For Model Context Protocol (legacy mcp-server)
  * - NoOpAdapter: Default when no adapter is configured
  *
  * @example

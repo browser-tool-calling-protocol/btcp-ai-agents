@@ -11,7 +11,7 @@
  *   createAliasResolver,
  *   parseAlias,
  *   containsAliases,
- * } from '@waiboard/ai-agents/aliases';
+ * } from '@btcp/ai-agents/aliases';
  *
  * // Create registry and register aliases
  * const registry = createAliasRegistry();

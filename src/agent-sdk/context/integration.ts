@@ -9,7 +9,7 @@
  *
  * @example
  * ```typescript
- * import { createIntegratedContext } from '@waiboard/ai-agents/context';
+ * import { createIntegratedContext } from '@btcp/ai-agents/context';
  *
  * const ctx = createIntegratedContext({
  *   maxTokens: 200_000,

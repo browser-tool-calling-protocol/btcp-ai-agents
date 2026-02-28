@@ -455,7 +455,7 @@ async function errorClassificationExample() {
   // Simulate different error types
   tracer.recordError(new Error("Rate limit exceeded (429)"));
   tracer.recordError(new Error("Connection timeout after 30s"));
-  tracer.recordError(new Error("MCP canvas-mcp server unreachable"));
+  tracer.recordError(new Error("MCP mcp-server server unreachable"));
   tracer.recordError(new Error("Tool canvas_invalid not found"));
 
   tracer.endTurn();

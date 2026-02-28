@@ -661,7 +661,7 @@ async function writeWithBackpressure(
  * @example
  * ```typescript
  * import express from 'express';
- * import { handleChat } from '@waiboard/ai-agents/handlers';
+ * import { handleChat } from '@btcp/ai-agents/handlers';
  *
  * const app = express();
  * app.use(express.json());
@@ -1020,7 +1020,7 @@ export function handleHealth(_req: Request, res: Response): void {
  * @example
  * ```typescript
  * import express from 'express';
- * import { createChatRouter } from '@waiboard/ai-agents/handlers';
+ * import { createChatRouter } from '@btcp/ai-agents/handlers';
  *
  * const app = express();
  * app.use('/api', await createChatRouter());

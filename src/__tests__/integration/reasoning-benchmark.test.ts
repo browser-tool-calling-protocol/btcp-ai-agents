@@ -9,12 +9,12 @@
  *
  * Quick smoke test:
  * ```bash
- * GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test src/__tests__/integration/reasoning-benchmark.test.ts
+ * GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test src/__tests__/integration/reasoning-benchmark.test.ts
  * ```
  *
  * Full benchmark with storage:
  * ```bash
- * GOOGLE_API_KEY=xxx RUN_FULL_BENCHMARK=true pnpm --filter=@waiboard/ai-agents test src/__tests__/integration/reasoning-benchmark.test.ts
+ * GOOGLE_API_KEY=xxx RUN_FULL_BENCHMARK=true pnpm --filter=@btcp/ai-agents test src/__tests__/integration/reasoning-benchmark.test.ts
  * ```
  *
  * ## Benchmark Categories
@@ -1275,25 +1275,25 @@ describe("Reasoning Benchmark (Skip Info)", () => {
 │  ─────────────────────────────────────────────────────────────────────────  │
 │                                                                             │
 │  Quick Smoke Test:                                                          │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents benchmark:smoke       │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents benchmark:smoke       │
 │                                                                             │
 │  TAOD Reasoning (Think → Act → Observe → Decide):                           │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents benchmark:taod        │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents benchmark:taod        │
 │                                                                             │
 │  Semantic Routing:                                                          │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents benchmark:routing     │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents benchmark:routing     │
 │                                                                             │
 │  Regression Tests:                                                          │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents benchmark:regression  │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents benchmark:regression  │
 │                                                                             │
 │  Edge Cases (requires RUN_FULL_BENCHMARK):                                  │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents benchmark:edge        │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents benchmark:edge        │
 │                                                                             │
 │  Baseline Comparison (requires RUN_FULL_BENCHMARK):                         │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents benchmark:baseline    │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents benchmark:baseline    │
 │                                                                             │
 │  Full Benchmark (all suites):                                               │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents benchmark:full        │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents benchmark:full        │
 │                                                                             │
 │  Estimated Costs:                                                           │
 │  - Smoke test: ~$0.02-0.05                                                  │

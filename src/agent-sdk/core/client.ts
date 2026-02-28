@@ -4,7 +4,7 @@
  * Native unified LLM client supporting multiple providers (Google Gemini, OpenAI).
  * Uses the provider abstraction for runtime provider selection.
  *
- * @module @waiboard/ai-agents/core
+ * @module @btcp/ai-agents/core
  */
 
 import type { ModelPreference, ModelProvider } from "../types/index.js";

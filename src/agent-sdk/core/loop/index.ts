@@ -144,7 +144,7 @@ function initializeIntegrationSystems(
  * Initialize loop context and state
  *
  * @param task - The task to execute
- * @param sessionId - Session identifier (previously canvasId for backward compat)
+ * @param sessionId - Session identifier
  */
 async function initializeLoop(
   task: string,
@@ -410,11 +410,10 @@ async function initializeLoop(
  * Main entry point for agent execution.
  * Implements the THINK → ACT → OBSERVE → DECIDE loop pattern.
  *
- * The second parameter is `sessionId` (historically called `canvasId` for
- * backward compatibility). It identifies the session for state management.
+ * The second parameter is `sessionId` which identifies the session for state management.
  *
  * @param task - The task to execute
- * @param sessionId - Session identifier (alias: canvasId for backward compat)
+ * @param sessionId - Session identifier
  * @param options - Loop configuration options
  * @param cancellation - Optional cancellation token
  *
@@ -431,7 +430,7 @@ async function initializeLoop(
  * }
  *
  * // Legacy (without adapter)
- * for await (const event of runAgenticLoop("Create a flowchart", "my-canvas", {
+ * for await (const event of runAgenticLoop("Create a flowchart", "my-session", {
  *   model: "balanced",
  * })) {
  *   if (event.type === "complete") {
@@ -469,7 +468,7 @@ export async function* runAgenticLoop(
         timestamp: Date.now(),
         error: {
           code: "MCP_CONNECTION_FAILED",
-          message: `Cannot connect to canvas-mcp server. Start it with: pnpm --filter @waiboard/canvas-mcp start:http`,
+          message: `Cannot connect to mcp-server server. Start it with: pnpm --filter @btcp/mcp-server start:http`,
           recoverable: false,
         },
       };
@@ -568,15 +567,15 @@ export async function* runAgenticLoop(
         }
 
         // Determine if we should force tool usage on first iteration (OpenAI only)
-        // Force tools when mode is a canvas operation (anything except "general" which is chat/greeting)
+        // Force tools when mode is a task operation (anything except "general" which is chat/greeting)
         // This uses the already-detected mode from mode-detection.ts for consistency
-        const isCanvasOperation = ctx.config.mode !== "general";
+        const isTaskOperation = ctx.config.mode !== "general";
         const shouldForceTools = wasFirstIteration &&
           ctx.llmProvider.name === "openai" &&
-          isCanvasOperation;
+          isTaskOperation;
 
         // Generate using the provider
-        // For OpenAI: use tool_choice: "required" on first iteration for canvas operations
+        // For OpenAI: use tool_choice: "required" on first iteration for task operations
         // This ensures the model uses tools instead of just responding with text
         const generateResult = await ctx.llmProvider.generate({
           model: ctx.modelId,
@@ -775,6 +774,7 @@ export async function* runAgenticLoop(
  * Agent resources for state tracking
  */
 export interface AgentResources {
+  /** @deprecated Use `session` instead */
   canvas: {
     id: string;
     version: number;
@@ -804,12 +804,12 @@ export interface AgentResources {
  * Initialize agent resources
  */
 export function initializeResources(
-  canvasId: string,
+  sessionId: string,
   taskId?: string
 ): AgentResources {
   return {
     canvas: {
-      id: canvasId,
+      id: sessionId,
       version: 0,
       summary: null,
       workingSet: [],
@@ -831,31 +831,34 @@ export function initializeResources(
 }
 
 /**
- * Run canvas agent and collect all events
+ * Run agent and collect all events
  */
-export async function runCanvasAgent(
+export async function runAgent(
   task: string,
-  canvasId: string,
+  sessionId: string,
   options?: LoopOptions
 ): Promise<AgentEvent[]> {
   const events: AgentEvent[] = [];
 
-  for await (const event of runAgenticLoop(task, canvasId, options)) {
+  for await (const event of runAgenticLoop(task, sessionId, options)) {
     events.push(event);
   }
 
   return events;
 }
 
+/** @deprecated Use runAgent instead */
+export const runCanvasAgent = runAgent;
+
 /**
- * Run canvas agent and return result summary
+ * Run agent and return result summary
  */
-export async function getCanvasAgentResult(
+export async function getAgentResult(
   task: string,
-  canvasId: string,
+  sessionId: string,
   options?: LoopOptions
 ): Promise<string> {
-  const events = await runCanvasAgent(task, canvasId, options);
+  const events = await runAgent(task, sessionId, options);
 
   const failedEvent = events.find((e) => e.type === "failed");
   if (failedEvent && failedEvent.type === "failed") {
@@ -869,3 +872,6 @@ export async function getCanvasAgentResult(
 
   throw new Error("Agent did not complete successfully");
 }
+
+/** @deprecated Use getAgentResult instead */
+export const getCanvasAgentResult = getAgentResult;

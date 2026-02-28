@@ -12,8 +12,6 @@
 import type { AgentToolName } from "../tools/generic-definitions.js";
 import type { ActionDefinition } from "../adapters/types.js";
 
-// Legacy type alias
-type BrowserToolName = AgentToolName;
 
 /**
  * Browser resource - current browser state
@@ -43,11 +41,6 @@ export interface BrowserSummary {
   toolCount: number;
 }
 
-// Legacy type aliases
-/** @deprecated Use BrowserResource instead */
-export type CanvasResource = BrowserResource;
-/** @deprecated Use BrowserSummary instead */
-export type CanvasSummary = BrowserSummary;
 
 /**
  * Viewport state
@@ -133,7 +126,7 @@ export interface TaskError {
   message: string;
   timestamp: number;
   recoverable: boolean;
-  tool?: CanvasToolName;
+  tool?: AgentToolName;
 }
 
 /**
@@ -177,8 +170,6 @@ export interface BrowserAwareness {
   compressionRatio?: number;
 }
 
-/** @deprecated Use BrowserAwareness instead */
-export type CanvasAwareness = BrowserAwareness;
 
 /**
  * Context resource - token management and cached context
@@ -230,7 +221,7 @@ export interface HistoryResource {
  * History entry
  */
 export interface HistoryEntry {
-  tool: BrowserToolName;
+  tool: AgentToolName;
   input: unknown;
   result: unknown;
   timestamp: number;
@@ -248,9 +239,6 @@ export interface AgentResources {
   history: HistoryResource;
 }
 
-// Legacy type alias for backward compatibility
-/** @deprecated Use AgentResources.browser instead of AgentResources.canvas */
-type CanvasToolName = BrowserToolName;
 
 /**
  * Create default resources
@@ -319,8 +307,6 @@ export function updateBrowser(
   };
 }
 
-/** @deprecated Use updateBrowser instead */
-export const updateCanvas = updateBrowser;
 
 /**
  * Update task resource
@@ -400,24 +386,24 @@ export function createCheckpoint(
 /**
  * Tools that mutate state (require context invalidation)
  */
-export const MUTATION_TOOLS: BrowserToolName[] = [
+export const MUTATION_TOOLS: AgentToolName[] = [
   "context_write",
   "task_execute",
-] as unknown as BrowserToolName[];
+] as unknown as AgentToolName[];
 
 /**
  * Tools that only read state (no invalidation needed)
  */
-export const READ_ONLY_TOOLS: BrowserToolName[] = [
+export const READ_ONLY_TOOLS: AgentToolName[] = [
   "context_read",
   "context_search",
   "state_snapshot",
-] as unknown as BrowserToolName[];
+] as unknown as AgentToolName[];
 
 /**
  * Check if a tool mutates browser state
  */
-export function isMutationTool(tool: BrowserToolName): boolean {
+export function isMutationTool(tool: AgentToolName): boolean {
   return MUTATION_TOOLS.includes(tool);
 }
 

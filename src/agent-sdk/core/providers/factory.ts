@@ -4,7 +4,7 @@
  * Factory for creating LLM provider instances based on provider name.
  * Enables runtime selection between Google Gemini and OpenAI.
  *
- * @module @waiboard/ai-agents/core/providers
+ * @module @btcp/ai-agents/core/providers
  */
 
 import type { LLMProvider, ProviderConfig, ProviderName } from "./base.js";

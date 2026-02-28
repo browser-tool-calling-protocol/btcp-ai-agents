@@ -26,8 +26,6 @@ export default defineConfig(({ mode }) => {
           'agents/index': resolve(__dirname, 'src/agents/index.ts'),
           'platform/index': resolve(__dirname, 'src/platform/index.ts'),
           'adapters/index': resolve(__dirname, 'src/adapters/index.ts'),
-          // Skill bundles
-          'skills/bundles/canvas': resolve(__dirname, 'src/skills/bundles/canvas.ts'),
         },
         formats: ['es', 'cjs'],
         fileName: (format, entryName) => {

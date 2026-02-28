@@ -12,7 +12,7 @@
  *   registerBuiltInProviders,
  *   colorProvider,
  *   timeProvider,
- * } from '@waiboard/ai-agents/resources';
+ * } from '@btcp/ai-agents/resources';
  *
  * // Create registry with built-in providers
  * const registry = new ResourceRegistry();

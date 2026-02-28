@@ -8,7 +8,7 @@
  *
  * @example
  * ```typescript
- * import { createSession } from '@waiboard/ai-agents/sdk';
+ * import { createSession } from '@btcp/ai-agents/sdk';
  *
  * // Create session
  * const session = await createSession({ canvasId: 'my-canvas' });

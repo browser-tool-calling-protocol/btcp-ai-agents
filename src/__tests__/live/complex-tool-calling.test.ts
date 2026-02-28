@@ -10,10 +10,10 @@
  *
  * Run with:
  * ```bash
- * GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:complex
+ * GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:complex
  * ```
  *
- * @module @waiboard/ai-agents/tests/live/complex
+ * @module @btcp/ai-agents/tests/live/complex
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -887,7 +887,7 @@ describe("Complex Tool Calling (Skip Info)", () => {
 │  These tests run complex multi-step agentic workflows with real LLM calls.  │
 │                                                                             │
 │  To run:                                                                    │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:complex     │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:complex     │
 │                                                                             │
 │  Estimated cost: ~$0.05-0.10 (multiple LLM calls per test)                  │
 │  Estimated time: ~3-5 minutes                                               │

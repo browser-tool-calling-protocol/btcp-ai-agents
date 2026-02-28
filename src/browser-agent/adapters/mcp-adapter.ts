@@ -63,7 +63,7 @@ export class MCPAdapter implements ActionAdapter {
   private client: HttpMcpClient;
   private connectionState: AdapterConnectionState = 'disconnected';
 
-  // Known MCP tools (canvas-mcp specific)
+  // Known MCP tools (mcp-server specific)
   private static readonly KNOWN_TOOLS: ActionDefinition[] = [
     {
       name: 'canvas_create',

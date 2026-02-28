@@ -1,5 +1,5 @@
 /**
- * MCP Integration Tests for @waiboard/ai-agents-oadk
+ * MCP Integration Tests for @btcp/ai-agents-oadk
  *
  * Tests the full flow from OADK agents through MCP tools to a mock canvas.
  * Uses a mock canvas-client with poll/ack protocol simulation.

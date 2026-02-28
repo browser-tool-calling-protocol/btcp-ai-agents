@@ -13,7 +13,7 @@
  *   SessionSerializer,
  *   FileStorage,
  *   createContextManager,
- * } from '@waiboard/ai-agents/context';
+ * } from '@btcp/ai-agents/context';
  *
  * // Save session
  * const manager = createContextManager();

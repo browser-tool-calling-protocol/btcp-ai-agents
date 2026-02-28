@@ -6,10 +6,10 @@
  *
  * Run with:
  * ```bash
- * GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:tool
+ * GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:tool
  * ```
  *
- * @module @waiboard/ai-agents/tests/live
+ * @module @btcp/ai-agents/tests/live
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -220,7 +220,7 @@ describe("Live Tool Calling (Skip Info)", () => {
 │  This test runs the full agentic loop with real LLM calls.                  │
 │                                                                             │
 │  To run:                                                                    │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:tool        │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:tool        │
 │                                                                             │
 │  Estimated cost: ~$0.01                                                     │
 └─────────────────────────────────────────────────────────────────────────────┘

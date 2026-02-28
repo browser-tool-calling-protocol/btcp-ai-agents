@@ -112,9 +112,11 @@ export {
   getAwarenessWithCaching,
   fetchAwareness,
   fetchAwarenessFromAdapter,
+  formatStateForContext,
   formatCanvasForContext,
   formatTasksForContext,
   formatUserMessage,
+  injectStateContextForIteration,
   injectCanvasContextForIteration,
   handleMutationToolEffect,
   // Types

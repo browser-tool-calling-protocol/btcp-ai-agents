@@ -14,7 +14,7 @@
  * 8. Clarification - canvas_clarify when task is ambiguous
  *
  * Run with:
- *   GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test src/__tests__/integration/reasoning-scenarios.test.ts
+ *   GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test src/__tests__/integration/reasoning-scenarios.test.ts
  *
  * @see README.md "Core Design: One Loop, LLM Decides"
  */
@@ -127,7 +127,7 @@ class MockCanvasDriver extends EventEmitter {
 }
 
 // ============================================================================
-// MOCK MCP CLIENT (Simulates canvas-mcp server)
+// MOCK MCP CLIENT (Simulates mcp-server server)
 // ============================================================================
 
 class MockMcpClient {
@@ -1186,7 +1186,7 @@ describe("Reasoning Scenarios Tests (Skip Info)", () => {
 │  real Gemini API calls.                                                 │
 │                                                                         │
 │  To run:                                                                │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test \\            │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test \\            │
 │    src/__tests__/integration/reasoning-scenarios.test.ts                │
 │                                                                         │
 │  Estimated cost: ~$0.05-0.20 per full run                               │

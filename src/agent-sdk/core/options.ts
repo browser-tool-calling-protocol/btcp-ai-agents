@@ -253,25 +253,27 @@ export interface SDKOptions {
 }
 
 // ============================================================================
-// CANVAS-SPECIFIC OPTIONS
+// AGENT OPTIONS
 // ============================================================================
 
 /**
- * Canvas agent options extending SDK options
+ * Agent options extending SDK options
  */
-export interface CanvasAgentOptions extends SDKOptions {
+export interface AgentOptions extends SDKOptions {
   // -------------------------------------------------------------------------
-  // Canvas-Specific (Required)
-  // -------------------------------------------------------------------------
-
-  /** Canvas ID to operate on */
-  canvasId: string;
-
-  // -------------------------------------------------------------------------
-  // Canvas-Specific (Optional)
+  // Session (Required)
   // -------------------------------------------------------------------------
 
-  /** Canvas MCP server URL (default: http://localhost:3112) */
+  /** Session ID to operate on */
+  sessionId: string;
+
+  // -------------------------------------------------------------------------
+  // Optional
+  // -------------------------------------------------------------------------
+
+  /** @deprecated Use sessionId instead */
+  canvasId?: string;
+  /** MCP server URL (default: http://localhost:3112) */
   mcpUrl?: string;
   /** AI provider preference */
   provider?: "google" | "openai" | "anthropic";
@@ -281,15 +283,19 @@ export interface CanvasAgentOptions extends SDKOptions {
   tokenBudget?: number;
 }
 
+/** @deprecated Use AgentOptions instead */
+export type CanvasAgentOptions = AgentOptions;
+
 // ============================================================================
 // LEGACY OPTIONS (for migration)
 // ============================================================================
 
 /**
  * Legacy agent configuration (deprecated)
- * @deprecated Use CanvasAgentOptions instead
+ * @deprecated Use AgentOptions instead
  */
 export interface LegacyAgentConfig {
+  sessionId?: string;
   canvasId?: string;
   model?: "sonnet" | "opus" | "haiku" | "gpt-4o" | string;
   provider?: "google" | "openai";
@@ -305,7 +311,7 @@ export interface LegacyAgentConfig {
 /**
  * Migrate legacy options to SDK-compatible format
  */
-export function migrateFromLegacyOptions(legacy: LegacyAgentConfig): CanvasAgentOptions {
+export function migrateFromLegacyOptions(legacy: LegacyAgentConfig): AgentOptions {
   // Map legacy model names to SDK model IDs
   const modelMapping: Record<string, ModelId> = {
     sonnet: "claude-3-5-sonnet-20241022",
@@ -315,7 +321,7 @@ export function migrateFromLegacyOptions(legacy: LegacyAgentConfig): CanvasAgent
   };
 
   return {
-    canvasId: legacy.canvasId || "",
+    sessionId: legacy.sessionId || legacy.canvasId || "",
     model: legacy.model ? modelMapping[legacy.model] || legacy.model : undefined,
     provider: legacy.provider,
     mcpUrl: legacy.mcpUrl,
@@ -343,9 +349,9 @@ export const DEFAULT_SDK_OPTIONS: Partial<SDKOptions> = {
 };
 
 /**
- * Default canvas agent options
+ * Default agent options
  */
-export const DEFAULT_CANVAS_OPTIONS: Partial<CanvasAgentOptions> = {
+export const DEFAULT_AGENT_OPTIONS: Partial<AgentOptions> = {
   ...DEFAULT_SDK_OPTIONS,
   mcpUrl: "http://localhost:3112",
   provider: "google",
@@ -356,9 +362,9 @@ export const DEFAULT_CANVAS_OPTIONS: Partial<CanvasAgentOptions> = {
 /**
  * Merge options with defaults
  */
-export function mergeWithDefaults(options: Partial<CanvasAgentOptions>): CanvasAgentOptions {
+export function mergeWithDefaults(options: Partial<AgentOptions>): AgentOptions {
   const merged = {
-    ...DEFAULT_CANVAS_OPTIONS,
+    ...DEFAULT_AGENT_OPTIONS,
     ...options,
   };
 
@@ -368,5 +374,8 @@ export function mergeWithDefaults(options: Partial<CanvasAgentOptions>): CanvasA
     merged.fallbackModel = MODEL_TIERS[merged.modelTier].fallback;
   }
 
-  return merged as CanvasAgentOptions;
+  return merged as AgentOptions;
 }
+
+/** @deprecated Use DEFAULT_AGENT_OPTIONS instead */
+export const DEFAULT_CANVAS_OPTIONS = DEFAULT_AGENT_OPTIONS;

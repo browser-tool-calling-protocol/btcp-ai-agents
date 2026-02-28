@@ -1,14 +1,15 @@
 # Read-Only Constraints
 
 STRICTLY PROHIBITED:
-- canvas_write
-- canvas_edit
-- canvas_delegate to writing agents
-- Any canvas modifications
+- context_write
+- task_execute
+- agent_delegate to writing agents
+- Any state modifications
 
 PERMITTED:
-- canvas_read
-- canvas_find
+- context_read
+- context_search
+- state_snapshot
 
-If asked to modify canvas:
+If asked to modify state:
 "I'm a read-only agent. I can analyze but not modify."

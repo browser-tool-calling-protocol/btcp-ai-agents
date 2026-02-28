@@ -6,10 +6,10 @@
  *
  * Run with:
  * ```bash
- * GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:hello
+ * GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:hello
  * ```
  *
- * @module @waiboard/ai-agents/tests/live
+ * @module @btcp/ai-agents/tests/live
  */
 
 import { describe, it, expect } from "vitest";
@@ -77,7 +77,7 @@ describe("Live Hello Smoke Test (Skip Info)", () => {
 │  This test verifies basic LLM connectivity with a simple hello prompt.      │
 │                                                                             │
 │  To run:                                                                    │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:hello       │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:hello       │
 │                                                                             │
 │  Estimated cost: ~$0.001                                                    │
 └─────────────────────────────────────────────────────────────────────────────┘

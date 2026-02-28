@@ -5,7 +5,7 @@
  *
  * @example
  * ```typescript
- * import { AliasRegistry, createAliasRegistry } from '@waiboard/ai-agents/aliases';
+ * import { AliasRegistry, createAliasRegistry } from '@btcp/ai-agents/aliases';
  *
  * const registry = createAliasRegistry();
  *

@@ -7,7 +7,7 @@
  * ## Quick Start
  *
  * ```typescript
- * import { ConversationTracer, ConsoleExporter } from '@waiboard/ai-agents/tracing';
+ * import { ConversationTracer, ConsoleExporter } from '@btcp/ai-agents/tracing';
  *
  * // Create tracer with console output
  * const tracer = new ConversationTracer({
@@ -35,7 +35,7 @@
  * ## With Automatic Instrumentation
  *
  * ```typescript
- * import { withTracing, createTracingHandlers } from '@waiboard/ai-agents/tracing';
+ * import { withTracing, createTracingHandlers } from '@btcp/ai-agents/tracing';
  *
  * const result = await withTracing('agent-query', async (tracer, handlers) => {
  *   handlers.onUserMessage('Create something');
@@ -50,7 +50,7 @@
  * ## Export to Files
  *
  * ```typescript
- * import { JsonLinesExporter, OTLPExporter } from '@waiboard/ai-agents/tracing';
+ * import { JsonLinesExporter, OTLPExporter } from '@btcp/ai-agents/tracing';
  *
  * const tracer = new ConversationTracer({
  *   exporters: [

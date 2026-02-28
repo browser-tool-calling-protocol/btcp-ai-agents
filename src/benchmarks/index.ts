@@ -7,7 +7,7 @@
  * ## Quick Start
  *
  * ```typescript
- * import { runSmokeTest, generateReport } from '@waiboard/ai-agents/benchmarks';
+ * import { runSmokeTest, generateReport } from '@btcp/ai-agents/benchmarks';
  *
  * // Run quick test
  * const result = await runSmokeTest('gemini-2.5-flash', 'google');
@@ -22,7 +22,7 @@
  *   defaultStorage,
  *   generateReport,
  *   analyzeTrends
- * } from '@waiboard/ai-agents/benchmarks';
+ * } from '@btcp/ai-agents/benchmarks';
  *
  * const runner = new BenchmarkRunner({
  *   model: 'gemini-2.5-flash',

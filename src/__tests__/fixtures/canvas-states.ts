@@ -1,18 +1,29 @@
 /**
- * Sample canvas state fixtures for testing
+ * Sample state fixtures for testing
+ *
+ * Domain-agnostic element fixtures that can represent
+ * any structured state (UI elements, DOM nodes, etc.)
  */
 
-import type { ExcalidrawElement } from "@waiboard/canvas-core";
+interface TestElement {
+	id: string;
+	type: string;
+	x: number;
+	y: number;
+	width?: number;
+	height?: number;
+	[key: string]: unknown;
+}
 
-export const emptyCanvasState = {
-	elements: [],
+export const emptyState = {
+	elements: [] as TestElement[],
 	appState: {
 		viewBackgroundColor: "#ffffff",
 	},
 	selectedElementIds: {},
 };
 
-export const singleRectangleState = {
+export const singleElementState = {
 	elements: [
 		{
 			id: "rect_1",
@@ -25,13 +36,12 @@ export const singleRectangleState = {
 			strokeColor: "#000000",
 			fillStyle: "solid",
 			strokeWidth: 2,
-			roughness: 1,
 			opacity: 100,
 			angle: 0,
 			locked: false,
 			isDeleted: false,
 		},
-	] as ExcalidrawElement[],
+	] as TestElement[],
 	appState: {
 		viewBackgroundColor: "#ffffff",
 	},
@@ -67,16 +77,15 @@ export const multipleElementsState = {
 			height: 50,
 			text: "Hello World",
 			fontSize: 20,
-			fontFamily: 1,
 		},
-	] as ExcalidrawElement[],
+	] as TestElement[],
 	appState: {
 		viewBackgroundColor: "#ffffff",
 	},
 	selectedElementIds: {},
 };
 
-export const arrowBindingState = {
+export const connectedElementsState = {
 	elements: [
 		{
 			id: "rect_1",
@@ -112,14 +121,14 @@ export const arrowBindingState = {
 				gap: 0,
 			},
 		},
-	] as ExcalidrawElement[],
+	] as TestElement[],
 	appState: {
 		viewBackgroundColor: "#ffffff",
 	},
 	selectedElementIds: {},
 };
 
-export const frameWithElementsState = {
+export const groupedElementsState = {
 	elements: [
 		{
 			id: "frame_1",
@@ -148,9 +157,19 @@ export const frameWithElementsState = {
 			height: 150,
 			frameId: "frame_1",
 		},
-	] as ExcalidrawElement[],
+	] as TestElement[],
 	appState: {
 		viewBackgroundColor: "#ffffff",
 	},
 	selectedElementIds: {},
 };
+
+// Legacy aliases for backward compatibility
+/** @deprecated Use emptyState */
+export const emptyCanvasState = emptyState;
+/** @deprecated Use singleElementState */
+export const singleRectangleState = singleElementState;
+/** @deprecated Use connectedElementsState */
+export const arrowBindingState = connectedElementsState;
+/** @deprecated Use groupedElementsState */
+export const frameWithElementsState = groupedElementsState;

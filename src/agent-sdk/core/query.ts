@@ -8,7 +8,7 @@
  *
  * @example
  * ```typescript
- * import { query } from '@waiboard/ai-agents/sdk';
+ * import { query } from '@btcp/ai-agents/sdk';
  *
  * const messages = query('Create a flowchart', {
  *   canvasId: 'my-canvas',
@@ -341,7 +341,7 @@ export function query(
     async mcpServerStatus() {
       // TODO: Implement actual MCP server status check
       return {
-        "canvas-mcp": {
+        "mcp-server": {
           connected: !!mergedOptions.mcpUrl,
           tools: resolveTools({ type: "all" }),
         },
@@ -525,7 +525,7 @@ export interface SSEResponse {
  * @example
  * ```typescript
  * import express from "express";
- * import { handleQueryStream } from '@waiboard/ai-agents/sdk';
+ * import { handleQueryStream } from '@btcp/ai-agents/sdk';
  *
  * const app = express();
  *

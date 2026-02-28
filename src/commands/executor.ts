@@ -5,7 +5,7 @@
  *
  * @example
  * ```typescript
- * import { CommandExecutor, createCommandExecutor } from '@waiboard/ai-agents/commands';
+ * import { CommandExecutor, createCommandExecutor } from '@btcp/ai-agents/commands';
  *
  * const executor = createCommandExecutor(registry, handler);
  *

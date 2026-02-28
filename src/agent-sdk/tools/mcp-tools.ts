@@ -6,7 +6,7 @@
  * canvas_capture, canvas_verify). Low-level MCP tool names are no longer used
  * by the ai-agents package.
  *
- * @see packages/canvas-mcp/src/tools.ts for tool implementations
+ * @see packages/mcp-server/src/tools.ts for tool implementations
  */
 
 /**

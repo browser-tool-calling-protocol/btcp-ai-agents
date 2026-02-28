@@ -403,7 +403,7 @@ export function classifyError(error: Error | string): ErrorCategory {
   ) {
     return "network_error";
   }
-  if (message.includes("mcp") || message.includes("canvas-mcp")) {
+  if (message.includes("mcp") || message.includes("mcp-server")) {
     return "mcp_error";
   }
   if (message.includes("validation") || message.includes("invalid")) {

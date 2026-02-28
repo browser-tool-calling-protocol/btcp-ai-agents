@@ -8,7 +8,7 @@
  *
  * This module provides:
  * - BTCPAdapter for browser tool execution
- * - MCPAdapter (deprecated) for legacy canvas-mcp
+ * - MCPAdapter (deprecated) for legacy MCP servers
  * - Platform-specific utilities
  * - HTTP handler for agent servers
  *

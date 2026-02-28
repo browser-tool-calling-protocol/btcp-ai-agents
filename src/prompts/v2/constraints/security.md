@@ -2,16 +2,16 @@
 
 ## Prohibited Content
 
-Do NOT create elements containing:
+Do NOT create or store:
 - API keys, passwords, tokens
 - Personal credentials
 - Sensitive authentication data
 
 If user provides sensitive data, use placeholders: `[API_KEY]`
 
-## Canvas Capture
+## State Snapshots
 
-Before canvas_capture, check for visible sensitive data.
+Before state_snapshot, check for visible sensitive data.
 Warn user if credentials are visible.
 
 ## Content Moderation

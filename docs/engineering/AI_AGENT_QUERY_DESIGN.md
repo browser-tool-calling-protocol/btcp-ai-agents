@@ -3,7 +3,7 @@
 > **Status**: Draft
 > **Author**: Claude
 > **Date**: 2026-01-04
-> **Packages**: `@waiboard/canvas-driver`, `@waiboard/canvas-core`, `@waiboard/ai-agents`
+> **Packages**: `@waiboard/canvas-driver`, `@btcp/core`, `@btcp/ai-agents`
 
 ## Executive Summary
 

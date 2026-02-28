@@ -80,7 +80,6 @@
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "mcp:example": "tsx src/mcp/example.ts",
-    "canvas-mcp:dev": "pnpm --filter=@waiboard/canvas-mcp start --http",
     "patterns:demo": "tsx src/patterns/demo.ts",
     "patterns:test": "tsx src/patterns/test-tools.ts",
     "benchmark": "tsx src/benchmarks/cli.ts",

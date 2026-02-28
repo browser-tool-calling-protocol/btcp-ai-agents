@@ -9,7 +9,7 @@
  *   createAliasResolver,
  *   parseAlias,
  *   containsAliases
- * } from '@waiboard/ai-agents/aliases';
+ * } from '@btcp/ai-agents/aliases';
  *
  * const resolver = createAliasResolver(registry);
  *
