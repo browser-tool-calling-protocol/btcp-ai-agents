@@ -1,16 +1,16 @@
 /**
  * Context Management
  *
- * Handles canvas awareness, context injection, and message formatting
+ * Handles state awareness, context injection, and message formatting
  * for the agentic loop.
  *
- * Updated to support ActionAdapter for domain-agnostic operation.
+ * Uses ActionAdapter for domain-agnostic operation.
  */
 
 import type {
   LoopContext,
   LoopState,
-  CanvasAwareness,
+  BrowserAwareness,
   PlanTask,
   ContextManager,
   McpClient,
@@ -28,9 +28,6 @@ import {
 } from "../../agents/state.js";
 import type { AgentToolName } from "../../tools/generic-definitions.js";
 
-// Legacy type aliases
-type CanvasToolName = AgentToolName;
-type CanvasSnapshotOutput = StateSnapshotOutput;
 
 // ============================================================================
 // AWARENESS MANAGEMENT
@@ -39,7 +36,7 @@ type CanvasSnapshotOutput = StateSnapshotOutput;
 /**
  * Mock awareness for test mode
  */
-export function createMockAwareness(sessionId: string): CanvasAwareness {
+export function createMockAwareness(sessionId: string): BrowserAwareness {
   return {
     summary: `Session "${sessionId}" is ready. Use context_read to get current state, task_execute to perform actions.`,
     tokensUsed: 100,
@@ -56,7 +53,7 @@ export function createMockAwareness(sessionId: string): CanvasAwareness {
 export async function getAwarenessWithCaching(
   ctx: LoopContext,
   state: LoopState
-): Promise<CanvasAwareness> {
+): Promise<BrowserAwareness> {
   // Test mode: always use mock
   if (ctx.config.skipMcpConnection && !ctx.adapter) {
     return createMockAwareness(ctx.sessionId);
@@ -92,47 +89,47 @@ export async function getAwarenessWithCaching(
 }
 
 /**
- * Fetch awareness from canvas via MCP resource
+ * Fetch awareness from MCP resource
  * @deprecated Use fetchAwarenessFromAdapter instead
  */
 export async function fetchAwarenessFromMcp(
   mcp: McpClient,
-  canvasId: string,
+  sessionId: string,
   task: string,
   options: ContextOptions
-): Promise<CanvasAwareness> {
+): Promise<BrowserAwareness> {
   try {
     // Build resource URI with query params
     const params = new URLSearchParams();
     if (task) params.set("task", task);
     if (options.tokenBudget) params.set("tokenBudget", String(options.tokenBudget));
 
-    const uri = `resource://canvas/${canvasId}/snapshot${params.toString() ? "?" + params.toString() : ""}`;
+    const uri = `resource://session/${sessionId}/snapshot${params.toString() ? "?" + params.toString() : ""}`;
 
     // Use readResource if available, otherwise fall back to callTool
-    let result: CanvasSnapshotOutput;
+    let result: StateSnapshotOutput;
     if (mcp.readResource) {
-      result = await mcp.readResource<CanvasSnapshotOutput>(uri);
+      result = await mcp.readResource<StateSnapshotOutput>(uri);
     } else {
       // Fall back to callTool
-      result = await mcp.callTool("canvas_snapshot", {
+      result = await mcp.callTool("state_snapshot", {
         task,
         tokenBudget: options.tokenBudget,
-      }) as CanvasSnapshotOutput;
+      }) as StateSnapshotOutput;
     }
 
     return {
-      summary: result.summary ?? "Canvas state unavailable",
+      summary: result.summary ?? "State unavailable",
       formatted: result.formatted,
-      skeleton: result.skeleton as CanvasAwareness["skeleton"],
-      relevant: result.relevant as CanvasAwareness["relevant"],
+      skeleton: result.skeleton as BrowserAwareness["skeleton"],
+      relevant: result.relevant as BrowserAwareness["relevant"],
       tokensUsed: result.tokensUsed ?? 0,
       compressionRatio: result.compressionRatio,
     };
   } catch {
     // Fallback to empty awareness on error - still encourage tool use
     return {
-      summary: `Canvas "${canvasId}" - use canvas_read to check current state.`,
+      summary: `Session "${sessionId}" - use context_read to check current state.`,
       tokensUsed: 50,
     };
   }
@@ -148,7 +145,7 @@ export async function fetchAwarenessFromAdapter(
   adapter: ActionAdapter,
   task: string,
   options: ContextOptions
-): Promise<CanvasAwareness> {
+): Promise<BrowserAwareness> {
   try {
     const awarenessContext = await adapter.getAwareness({
       includeSkeleton: true,
@@ -159,8 +156,8 @@ export async function fetchAwarenessFromAdapter(
 
     return {
       summary: awarenessContext.summary,
-      skeleton: awarenessContext.skeleton as CanvasAwareness["skeleton"],
-      relevant: awarenessContext.relevant as CanvasAwareness["relevant"],
+      skeleton: awarenessContext.skeleton as BrowserAwareness["skeleton"],
+      relevant: awarenessContext.relevant as BrowserAwareness["relevant"],
       availableTools: awarenessContext.availableActions?.map((name) => ({
         name,
         description: adapter.getActionSchema(name)?.description || "",
@@ -183,7 +180,7 @@ export async function fetchAwareness(
   ctx: LoopContext,
   task: string,
   options: ContextOptions
-): Promise<CanvasAwareness> {
+): Promise<BrowserAwareness> {
   // Prefer adapter if available
   if (ctx.adapter) {
     return fetchAwarenessFromAdapter(ctx.adapter, task, options);
@@ -199,16 +196,16 @@ export async function fetchAwareness(
 }
 
 /**
- * Fetch canvas snapshot for context injection
+ * Fetch state snapshot for context injection
  *
  * Uses adapter if available, otherwise falls back to MCP client.
  */
-export async function fetchCanvasSnapshot(
+export async function fetchStateSnapshot(
   ctx: LoopContext,
   state: LoopState
-): Promise<CanvasSnapshotOutput | null> {
+): Promise<StateSnapshotOutput | null> {
   try {
-    let snapshotResult: CanvasSnapshotOutput | null = null;
+    let snapshotResult: StateSnapshotOutput | null = null;
 
     // Prefer adapter if available
     if (ctx.adapter) {
@@ -221,16 +218,16 @@ export async function fetchCanvasSnapshot(
       };
     } else if (ctx.mcpClient.execute) {
       // Use execute if available
-      snapshotResult = await ctx.mcpClient.execute<CanvasSnapshotOutput>(
-        "canvas_snapshot",
+      snapshotResult = await ctx.mcpClient.execute<StateSnapshotOutput>(
+        "state_snapshot",
         { format: "level1" }
       );
     } else {
       // Fall back to callTool
       snapshotResult = await ctx.mcpClient.callTool(
-        "canvas_snapshot",
+        "state_snapshot",
         { format: "level1" }
-      ) as CanvasSnapshotOutput;
+      ) as StateSnapshotOutput;
     }
 
     if (snapshotResult && typeof snapshotResult === "object") {
@@ -248,19 +245,22 @@ export async function fetchCanvasSnapshot(
 // ============================================================================
 
 /**
- * Format canvas state for context injection (Level 1 summary - ~50 tokens)
+ * Format state for context injection (Level 1 summary - ~50 tokens)
  */
-export function formatCanvasForContext(snapshot: CanvasSnapshotOutput): string {
+export function formatStateForContext(snapshot: StateSnapshotOutput): string {
   const typeBreakdown = Object.entries(snapshot.typeCounts || {})
     .map(([type, count]) => `${count} ${type}s`)
     .join(", ");
 
-  return `## Canvas State
+  return `## Current State
 - Elements: ${snapshot.elementCount || 0} (${typeBreakdown || "empty"})
 - Selection: ${snapshot.selection?.join(", ") || "none"}
 - Viewport: ${JSON.stringify(snapshot.viewport || { x: 0, y: 0, zoom: 1 })}
-- Available space: ${snapshot.availableRegions?.join(", ") || "full canvas"}`;
+- Available space: ${snapshot.availableRegions?.join(", ") || "full"}`;
 }
+
+/** @deprecated Use formatStateForContext instead */
+export const formatCanvasForContext = formatStateForContext;
 
 /**
  * Format task list for context injection (like Claude Code's TodoWrite)
@@ -307,29 +307,29 @@ export function getTaskProgress(tasks: PlanTask[]): {
 }
 
 /**
- * Inject canvas and task context for iteration
+ * Inject state and task context for iteration
  */
-export function injectCanvasContextForIteration(
+export function injectStateContextForIteration(
   contextManager: ContextManager,
-  canvasSnapshot: CanvasSnapshotOutput | null,
+  stateSnapshot: StateSnapshotOutput | null,
   taskState: PlanTask[],
   corrections: string | null
 ): { tokensUsed: number } {
   let tokensUsed = 0;
 
-  // Inject fresh canvas state (Level 1 summary - ~50 tokens)
-  if (canvasSnapshot) {
-    const canvasSummary = formatCanvasForContext(canvasSnapshot);
-    const canvasMsg = createMessage("system", canvasSummary, {
+  // Inject fresh state (Level 1 summary - ~50 tokens)
+  if (stateSnapshot) {
+    const stateSummary = formatStateForContext(stateSnapshot);
+    const stateMsg = createMessage("system", stateSummary, {
       priority: MessagePriority.HIGH,
       metadata: {
-        type: "canvas_state",
+        type: "state_snapshot",
         refreshedAt: Date.now(),
         ttl: 0, // Never cache
       },
     });
-    contextManager.addMessage(canvasMsg, { tier: MemoryTier.EPHEMERAL });
-    tokensUsed += canvasMsg.tokens ?? 0;
+    contextManager.addMessage(stateMsg, { tier: MemoryTier.EPHEMERAL });
+    tokensUsed += stateMsg.tokens ?? 0;
   }
 
   // Inject task state if exists
@@ -361,7 +361,7 @@ export function injectCanvasContextForIteration(
  */
 export function formatUserMessage(
   task: string,
-  awareness: CanvasAwareness,
+  awareness: BrowserAwareness,
   history: Array<{ tool: string; result: unknown }>,
   taskState?: PlanTask[]
 ): string {
@@ -369,12 +369,12 @@ export function formatUserMessage(
 
   parts.push(`Task: ${task}`);
   parts.push("");
-  parts.push("## Current Canvas State");
+  parts.push("## Current State");
   parts.push(awareness.summary);
 
   if (awareness.skeleton) {
     parts.push("");
-    parts.push("## Canvas Structure");
+    parts.push("## State Structure");
     parts.push(JSON.stringify(awareness.skeleton, null, 2));
   }
 
@@ -420,7 +420,7 @@ export function formatUserMessage(
  */
 export function handleMutationToolEffect(
   state: LoopState,
-  toolName: CanvasToolName,
+  toolName: AgentToolName,
   verbose?: boolean
 ): void {
   if (isMutationTool(toolName)) {
@@ -434,3 +434,9 @@ export function handleMutationToolEffect(
     state.resources.browser.version++;
   }
 }
+
+/** @deprecated Use injectStateContextForIteration instead */
+export const injectCanvasContextForIteration = injectStateContextForIteration;
+
+/** @deprecated Use fetchStateSnapshot instead */
+export const fetchCanvasSnapshot = fetchStateSnapshot;

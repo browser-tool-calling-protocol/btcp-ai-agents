@@ -4,7 +4,7 @@
  * Provides a consistent logging interface for both the agentic loop
  * and benchmark system. Supports multiple output destinations.
  *
- * @module @waiboard/ai-agents/core
+ * @module @btcp/ai-agents/core
  */
 
 // ============================================================================

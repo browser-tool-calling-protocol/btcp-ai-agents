@@ -19,11 +19,7 @@ config({ path: resolve(__dirname, '.env') });
  */
 export const baseConfig = {
   resolve: {
-    alias: {
-      '@waiboard/canvas-driver': resolve(__dirname, '../canvas-driver/src'),
-      '@waiboard/canvas-core': resolve(__dirname, '../canvas-core/src'),
-      '@waiboard/db': resolve(__dirname, '../db/src'),
-    },
+    alias: {},
   },
   test: {
     globals: true,

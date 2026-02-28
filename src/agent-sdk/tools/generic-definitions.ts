@@ -3,16 +3,6 @@
  *
  * Defines the core generic tools for the @btcp/ai-agents system.
  * These tools are domain-agnostic and work with any action adapter backend.
- *
- * Tool Mapping from Canvas Tools:
- * - canvas_read   -> context_read
- * - canvas_write  -> context_write
- * - canvas_edit   -> task_execute
- * - canvas_find   -> context_search
- * - canvas_capture -> state_snapshot
- * - canvas_delegate -> agent_delegate
- * - canvas_plan   -> agent_plan
- * - canvas_clarify -> agent_clarify
  */
 
 import { z } from 'zod';
@@ -400,7 +390,7 @@ export type AgentClarifyInput = z.infer<typeof AgentClarifyInputSchema>;
 // ============================================================================
 
 /**
- * Tool result type (same as canvas tools for compatibility)
+ * Tool result type
  */
 export interface GenericToolResult<T = unknown> {
   success: boolean;
@@ -573,30 +563,3 @@ export function getGenericToolSchema(name: AgentToolName) {
   return GENERIC_TOOL_SCHEMAS[name];
 }
 
-/**
- * Map canvas tool names to generic tool names
- */
-export const CANVAS_TO_GENERIC_MAP: Record<string, AgentToolName> = {
-  canvas_read: 'context_read',
-  canvas_write: 'context_write',
-  canvas_edit: 'task_execute',
-  canvas_find: 'context_search',
-  canvas_capture: 'state_snapshot',
-  canvas_delegate: 'agent_delegate',
-  canvas_plan: 'agent_plan',
-  canvas_clarify: 'agent_clarify',
-};
-
-/**
- * Map generic tool names to canvas tool names
- */
-export const GENERIC_TO_CANVAS_MAP: Record<AgentToolName, string> = {
-  context_read: 'canvas_read',
-  context_write: 'canvas_write',
-  task_execute: 'canvas_edit',
-  context_search: 'canvas_find',
-  state_snapshot: 'canvas_capture',
-  agent_delegate: 'canvas_delegate',
-  agent_plan: 'canvas_plan',
-  agent_clarify: 'canvas_clarify',
-};

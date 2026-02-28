@@ -14,10 +14,10 @@
  *
  * Run with:
  * ```bash
- * GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:planning
+ * GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:planning
  * ```
  *
- * @module @waiboard/ai-agents/tests/live/planning
+ * @module @btcp/ai-agents/tests/live/planning
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -892,7 +892,7 @@ describe("Planning Scenario (Skip Info)", () => {
 │  delegating to sub-agents.                                                  │
 │                                                                             │
 │  To run:                                                                    │
-│  GOOGLE_API_KEY=xxx pnpm --filter=@waiboard/ai-agents test:live:planning    │
+│  GOOGLE_API_KEY=xxx pnpm --filter=@btcp/ai-agents test:live:planning    │
 │                                                                             │
 │  Estimated cost: ~$0.10-0.20 (multiple LLM calls per test)                  │
 │  Estimated time: ~5-10 minutes                                              │

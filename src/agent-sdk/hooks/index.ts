@@ -11,7 +11,7 @@
  *   hooksManager,
  *   CommonHooks,
  *   createHooksManager,
- * } from '@waiboard/ai-agents/hooks';
+ * } from '@btcp/ai-agents/hooks';
  *
  * // Use default instance
  * hooksManager.onPostToolUse(CommonHooks.logOperations);

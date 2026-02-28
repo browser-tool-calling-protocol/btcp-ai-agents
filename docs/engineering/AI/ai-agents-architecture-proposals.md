@@ -3441,7 +3441,7 @@ packages/canvas-semantic/
 #### Usage
 
 ```typescript
-import { CanvasWorld } from '@waiboard/canvas-core/ecs';
+import { CanvasWorld } from '@btcp/core/ecs';
 import { SemanticPlugin } from '@waiboard/canvas-semantic';
 
 // Install plugin

@@ -2,28 +2,28 @@
 
 ## Conversational (no tools)
 
-- "hello" → "Hi! What would you like to create?"
+- "hello" → "Hi! What would you like to do?"
 - "thanks" → "You're welcome!"
 - "what can you do?" → Brief capability summary
 
-## Canvas Operations (use tools)
+## Task Operations (use tools)
 
-- "create a flowchart for login" → canvas_delegate or canvas_write
-- "what's on the canvas?" → canvas_read
-- "move that left" → canvas_edit
-- "add a rectangle" → canvas_write
+- "analyze the current state" → context_read
+- "execute the migration" → task_execute
+- "find all errors" → context_search
+- "plan the workflow" → agent_plan
 
-## Unclear Requests (canvas_clarify)
+## Unclear Requests (agent_clarify)
 
-When output type or topic is unclear:
+When output type or requirements are unclear:
 
 ```
-canvas_clarify({
-  questions: ["What type of visualization?"],
+agent_clarify({
+  questions: ["What type of task?"],
   options: [
-    { label: "Mindmap", value: "mindmap" },
-    { label: "Flowchart", value: "flowchart" },
-    { label: "Wireframe", value: "wireframe" }
+    { label: "Analysis", value: "analysis" },
+    { label: "Execution", value: "execution" },
+    { label: "Planning", value: "planning" }
   ]
 })
 ```

@@ -4,7 +4,6 @@
 
 import type { AgentEvent } from "../types/agent.js";
 import type { ReasoningResult } from "../core/client.js";
-import type { ExcalidrawElement } from "@waiboard/canvas-core";
 
 /**
  * Create a mock AI SDK reasoning result
@@ -24,15 +23,13 @@ export function createMockAISDKResponse(
 }
 
 /**
- * Create a mock canvas state
+ * Create a mock state with elements
  */
-export function createMockCanvasState(elements?: ExcalidrawElement[]) {
+export function createMockState(elements?: Array<Record<string, unknown>>) {
 	return {
 		elements: elements ?? [],
 		appState: {
 			viewBackgroundColor: "#ffffff",
-			currentItemFontFamily: 1,
-			currentItemFontSize: 20,
 		},
 		selectedElementIds: {},
 	};
@@ -97,7 +94,7 @@ export function createMockAgentEvent(
 			return {
 				...baseEvent,
 				type: "tool_call",
-				tool: data?.tool ?? "canvas_write",
+				tool: data?.tool ?? "task_execute",
 				args: data?.args ?? {},
 				...data,
 			} as AgentEvent;
@@ -106,7 +103,7 @@ export function createMockAgentEvent(
 			return {
 				...baseEvent,
 				type: "tool_result",
-				tool: data?.tool ?? "canvas_write",
+				tool: data?.tool ?? "task_execute",
 				result: data?.result ?? { success: true },
 				...data,
 			} as AgentEvent;

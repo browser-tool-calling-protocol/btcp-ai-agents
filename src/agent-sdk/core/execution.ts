@@ -7,11 +7,11 @@
  * The execution engine runs a THINK → ACT → OBSERVE → DECIDE loop
  * with streaming async generator for real-time feedback.
  *
- * @module @waiboard/ai-agents/core
+ * @module @btcp/ai-agents/core
  *
  * @example
  * ```typescript
- * import { execute, type ExecuteOptions, type SDKMessage } from '@waiboard/ai-agents/core';
+ * import { execute, type ExecuteOptions, type SDKMessage } from '@btcp/ai-agents/core';
  *
  * // Execute a task
  * for await (const message of execute('Create a flowchart', {

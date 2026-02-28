@@ -4,7 +4,7 @@
  * Native implementation of the LLMProvider interface for OpenAI models.
  * Uses the official OpenAI SDK for API calls.
  *
- * @module @waiboard/ai-agents/core/providers
+ * @module @btcp/ai-agents/core/providers
  * @see https://platform.openai.com/docs/api-reference
  */
 

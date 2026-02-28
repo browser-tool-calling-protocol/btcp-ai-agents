@@ -445,7 +445,7 @@ touch packages/ai-agents/src/agents/shared-components.ts
 
 ```bash
 # Run agent tests
-pnpm --filter @waiboard/ai-agents test
+pnpm --filter @btcp/ai-agents test
 
 # Manual testing scenarios:
 # - Vague request → should clarify

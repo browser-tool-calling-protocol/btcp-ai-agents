@@ -8,7 +8,7 @@
  *
  * @example
  * ```typescript
- * import { tool } from '@waiboard/ai-agents/sdk';
+ * import { tool } from '@btcp/ai-agents/sdk';
  * import { z } from 'zod';
  *
  * const myTool = tool({

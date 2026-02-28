@@ -85,5 +85,4 @@ export {
   type CommandHandler,
 } from "./executor.js";
 
-// Note: Domain-specific commands should be registered dynamically
-// The predefined canvas commands have been removed - use createCommandRegistry() to create custom commands
+// Note: Domain-specific commands should be registered dynamically via createCommandRegistry()

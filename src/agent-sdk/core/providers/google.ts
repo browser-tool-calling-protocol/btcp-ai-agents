@@ -4,7 +4,7 @@
  * Native implementation of the LLMProvider interface for Google Gemini models.
  * Includes direct Google GenAI client integration.
  *
- * @module @waiboard/ai-agents/core/providers
+ * @module @btcp/ai-agents/core/providers
  * @see https://ai.google.dev/gemini-api/docs
  */
 

@@ -7,15 +7,15 @@
   ],
   "manual_call_templates": [
     {
-      "name": "canvas",
+      "name": "actions",
       "call_template_type": "http",
       "http_method": "POST",
-      "url": "http://localhost:3009/api/canvas",
+      "url": "http://localhost:3009/api/actions",
       "content_type": "application/json",
-      "description": "Canvas manipulation tools",
+      "description": "Domain action tools",
       "tools": {
         "query_entities": {
-          "description": "Find entities on canvas by selector",
+          "description": "Find entities in context by selector",
           "method": "POST",
           "path": "/query",
           "input_schema": {
@@ -32,7 +32,7 @@
           }
         },
         "create_entity": {
-          "description": "Create new entity on canvas",
+          "description": "Create new entity in context",
           "method": "POST",
           "path": "/create",
           "input_schema": {
@@ -108,7 +108,7 @@
           }
         },
         "delete_entities": {
-          "description": "Delete entities from canvas",
+          "description": "Delete entities from context",
           "method": "POST",
           "path": "/delete",
           "input_schema": {

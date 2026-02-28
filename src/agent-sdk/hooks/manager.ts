@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { HooksManager } from '@waiboard/ai-agents/hooks';
+ * import { HooksManager } from '@btcp/ai-agents/hooks';
  *
  * const hooks = new HooksManager();
  *

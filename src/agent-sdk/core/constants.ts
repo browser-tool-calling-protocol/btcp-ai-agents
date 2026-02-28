@@ -4,11 +4,11 @@
  * Native configuration defaults and limits for the SDK.
  * Single source of truth for model IDs and configuration.
  *
- * @module @waiboard/ai-agents/core
+ * @module @btcp/ai-agents/core
  *
  * @example
  * ```typescript
- * import { DEFAULTS, LIMITS, MODELS, MODEL_IDS } from '@waiboard/ai-agents/core';
+ * import { DEFAULTS, LIMITS, MODELS, MODEL_IDS } from '@btcp/ai-agents/core';
  *
  * console.log(DEFAULTS.maxIterations); // 20
  * console.log(LIMITS.maxErrors); // 3

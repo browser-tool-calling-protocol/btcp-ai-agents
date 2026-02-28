@@ -1,6 +1,7 @@
 # Claude Agent SDK Integration
 
-> **Goal**: Use Claude Agent SDK as the AI agent engine for canvas operations.
+> **Goal**: Use Claude Agent SDK as the AI agent engine.
+> **Note**: This is a historical proposal document. The framework has since been generalized beyond canvas-specific operations.
 
 ## Why Claude Agent SDK
 
@@ -21,7 +22,7 @@ You don't reimplement this. You use it.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                    @waiboard/ai-agents                               │
+│                    @btcp/ai-agents                               │
 ├─────────────────────────────────────────────────────────────────────┤
 │  Agent Engine: Claude Agent SDK                                      │
 │  Model: Claude Sonnet 4.5 / Opus 4.5                                │
@@ -49,7 +50,7 @@ export async function generateCanvasImage(prompt: string) {
 ## Installation
 
 ```bash
-pnpm add @anthropic-ai/claude-agent-sdk --filter=@waiboard/ai-agents
+pnpm add @anthropic-ai/claude-agent-sdk --filter=@btcp/ai-agents
 ```
 
 **Requirements:**

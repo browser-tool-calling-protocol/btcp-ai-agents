@@ -16,8 +16,6 @@ export default mergeConfig(
       include: [
         // Co-located unit tests (direct source companions)
         'src/hooks/manager.test.ts',
-        'src/tools/canvas-verify.test.ts',
-        'src/tools/canvas-execute.test.ts',
         'src/tools/semantic-search.test.ts',
         'src/tools/definitions.test.ts',
         'src/templates/templates.test.ts',

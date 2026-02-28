@@ -5,7 +5,7 @@
  *
  * @example
  * ```typescript
- * import { extractJson, extractCodeBlock, parseStructured } from '@waiboard/ai-agents/sdk';
+ * import { extractJson, extractCodeBlock, parseStructured } from '@btcp/ai-agents/sdk';
  *
  * const json = extractJson(response);
  * const code = extractCodeBlock(response, 'typescript');

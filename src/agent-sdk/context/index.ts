@@ -17,7 +17,7 @@
  *   createContextManager,
  *   createMessage,
  *   MemoryTier,
- * } from '@waiboard/ai-agents/context';
+ * } from '@btcp/ai-agents/context';
  *
  * const manager = createContextManager({ maxTokens: 200_000 });
  *

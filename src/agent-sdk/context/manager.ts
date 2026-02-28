@@ -664,7 +664,7 @@ export class ContextManager {
    * @example
    * ```typescript
    * // Use with serialization module:
-   * import { exportSessionToJSON } from '@waiboard/ai-agents/context';
+   * import { exportSessionToJSON } from '@btcp/ai-agents/context';
    *
    * const json = exportSessionToJSON(manager, 'session-id');
    * ```

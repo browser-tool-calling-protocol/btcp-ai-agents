@@ -15,7 +15,7 @@
  *
  * Everything outside these tags is the user-facing response.
  *
- * @module @waiboard/ai-agents/core
+ * @module @btcp/ai-agents/core
  */
 
 /**

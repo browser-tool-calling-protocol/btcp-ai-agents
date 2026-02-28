@@ -4,11 +4,11 @@
  * Native implementation of unified LLM provider interface for
  * Google Gemini and OpenAI models.
  *
- * @module @waiboard/ai-agents/core/providers
+ * @module @btcp/ai-agents/core/providers
  *
  * @example
  * ```typescript
- * import { createProvider, type LLMProvider } from "@waiboard/ai-agents/core/providers";
+ * import { createProvider, type LLMProvider } from "@btcp/ai-agents/core/providers";
  *
  * // Create provider based on availability
  * const provider = createProvider("google");

@@ -1,11 +1,11 @@
 /**
  * HTTP MCP Client
  *
- * Real HTTP client for connecting to the canvas-mcp server.
+ * Real HTTP client for connecting to the mcp-server server.
  * Replaces the mock implementation in agentic-loop.ts.
  *
  * Features:
- * - HTTP transport to canvas-mcp server
+ * - HTTP transport to mcp-server server
  * - Canvas ID binding via headers
  * - Health checking with exponential backoff retry
  * - Circuit breaker pattern for resilience
@@ -64,7 +64,7 @@ type CircuitState = "closed" | "open" | "half-open";
  * Configuration for HTTP MCP client
  */
 export interface HttpMcpClientConfig {
-  /** Base URL of canvas-mcp server (default: http://localhost:3112) */
+  /** Base URL of mcp-server server (default: http://localhost:3112) */
   baseUrl?: string;
   /** Canvas ID to bind to (required) */
   canvasId: string;
@@ -121,7 +121,7 @@ function calculateBackoffDelay(
 /**
  * HTTP MCP Client
  *
- * Connects to canvas-mcp server via HTTP for tool execution.
+ * Connects to mcp-server server via HTTP for tool execution.
  * Includes exponential backoff retry and circuit breaker for resilience.
  */
 export class HttpMcpClient implements McpClient {
@@ -262,7 +262,7 @@ export class HttpMcpClient implements McpClient {
         if (data.status === "ok") {
           this.connected = true;
           this.recordSuccess();
-          this.log(`Connected to canvas-mcp at ${this.baseUrl}`);
+          this.log(`Connected to mcp-server at ${this.baseUrl}`);
           return true;
         }
 
@@ -326,7 +326,7 @@ export class HttpMcpClient implements McpClient {
       if (!connected) {
         throw new Error(
           `Canvas MCP server not available at ${this.baseUrl}. ` +
-            `Start the server with: pnpm --filter @waiboard/canvas-mcp start:http`
+            `Start the server with: pnpm --filter @btcp/mcp-server start:http`
         );
       }
     }
@@ -452,7 +452,7 @@ export class HttpMcpClient implements McpClient {
       if (!connected) {
         throw new Error(
           `Canvas MCP server not available at ${this.baseUrl}. ` +
-            `Start the server with: pnpm --filter @waiboard/canvas-mcp start:http`
+            `Start the server with: pnpm --filter @btcp/mcp-server start:http`
         );
       }
     }
@@ -522,7 +522,7 @@ export class HttpMcpClient implements McpClient {
    */
   disconnect(): void {
     this.connected = false;
-    this.log("Disconnected from canvas-mcp");
+    this.log("Disconnected from mcp-server");
   }
 
   /**

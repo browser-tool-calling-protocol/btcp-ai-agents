@@ -55,7 +55,7 @@ await session.close();
 
 ### 1. ActionAdapter Interface
 
-The `ActionAdapter` is the primary abstraction that enables domain-agnostic operation. Any backend (browser, canvas, database, API) implements this interface.
+The `ActionAdapter` is the primary abstraction that enables domain-agnostic operation. Any backend (browser, database, API, etc.) implements this interface.
 
 ```typescript
 interface ActionAdapter {
@@ -330,7 +330,7 @@ export { runAgenticLoop, AgentEvent, ActionAdapter }
 
 Before (coupled to MCP):
 ```typescript
-const mcp = new HttpMcpClient({ baseUrl, canvasId });
+const mcp = new HttpMcpClient({ baseUrl, sessionId });
 await mcp.connect();
 const result = await mcp.callTool('create', { type: 'rectangle' });
 ```
@@ -339,17 +339,17 @@ After (adapter pattern):
 ```typescript
 import { createMCPAdapter } from '@btcp/ai-agents/browser-agent';
 
-const adapter = createMCPAdapter({ baseUrl, canvasId });
+const adapter = createMCPAdapter({ baseUrl, sessionId });
 await adapter.connect();
 const result = await adapter.execute('create', { type: 'rectangle' });
 ```
 
-### From Canvas-specific to Generic
+### From Domain-specific to Generic
 
 Before:
 ```typescript
-for await (const event of runAgenticLoop(task, canvasId, options)) {
-  // Canvas-specific handling
+for await (const event of runAgenticLoop(task, sessionId, options)) {
+  // Domain-specific handling
 }
 ```
 
@@ -364,7 +364,7 @@ for await (const event of runAgenticLoop(task, sessionId, { adapter })) {
 
 ## Design Principles
 
-1. **Domain Agnostic Core**: The agent framework knows nothing about browsers, canvases, or specific tools
+1. **Domain Agnostic Core**: The agent framework knows nothing about specific domains or tools
 2. **Adapter Pattern**: All domain-specific logic is encapsulated in adapters
 3. **Streaming First**: All events are streamed via async generators
 4. **Composable Hooks**: Pre/post hooks enable observability and control

@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This document analyzes the gap between Claude Code's production system prompts (v2.1.1) and Waiboard's `@waiboard/ai-agents` implementation. While Waiboard has implemented many Claude Code patterns (TAOD loop, semantic routing, sub-agent delegation), several critical gaps exist in **constraint specificity**, **agent boundaries**, **response formatting**, and **safety mechanisms**.
+This document analyzes the gap between Claude Code's production system prompts (v2.1.1) and Waiboard's `@btcp/ai-agents` implementation. While Waiboard has implemented many Claude Code patterns (TAOD loop, semantic routing, sub-agent delegation), several critical gaps exist in **constraint specificity**, **agent boundaries**, **response formatting**, and **safety mechanisms**.
 
 ### Key Findings
 

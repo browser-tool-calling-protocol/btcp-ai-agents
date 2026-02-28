@@ -57,13 +57,6 @@ function sessionIdMiddleware(
     sessionId = req.body.sessionId;
   }
 
-  // Legacy support: also check for X-Canvas-Id / canvasId
-  if (!sessionId) {
-    sessionId = req.headers["x-canvas-id"] as string | undefined;
-    if (!sessionId && req.body?.canvasId) {
-      sessionId = req.body.canvasId;
-    }
-  }
 
   if (sessionId) {
     // Attach to request for handlers
@@ -81,7 +74,7 @@ async function main(): Promise<void> {
     cors({
       origin: "*",
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization", "X-Session-Id", "X-Canvas-Id"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-Session-Id"],
       maxAge: 86400,
     })
   );
